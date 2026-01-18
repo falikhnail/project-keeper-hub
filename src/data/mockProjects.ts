@@ -1,0 +1,88 @@
+import { Project } from '@/types/project';
+
+export const mockProjects: Project[] = [
+  {
+    id: '1',
+    name: 'E-Commerce Platform',
+    description: 'Modern e-commerce platform dengan fitur cart, checkout, dan payment gateway integration.',
+    link: 'https://github.com/team/ecommerce-platform',
+    status: 'active',
+    lastHandler: {
+      name: 'Ahmad Rizki',
+      email: 'ahmad.rizki@company.com',
+    },
+    updatedAt: new Date('2025-01-17'),
+    createdAt: new Date('2024-11-01'),
+    tags: ['React', 'Node.js', 'PostgreSQL'],
+  },
+  {
+    id: '2',
+    name: 'Mobile Banking App',
+    description: 'Aplikasi mobile banking dengan fitur transfer, pembayaran, dan investment tracking.',
+    link: 'https://github.com/team/mobile-banking',
+    status: 'active',
+    lastHandler: {
+      name: 'Siti Nurhaliza',
+      email: 'siti.nur@company.com',
+    },
+    updatedAt: new Date('2025-01-16'),
+    createdAt: new Date('2024-09-15'),
+    tags: ['React Native', 'Firebase', 'TypeScript'],
+  },
+  {
+    id: '3',
+    name: 'HR Management System',
+    description: 'Sistem manajemen HR dengan fitur payroll, attendance, dan performance review.',
+    link: 'https://github.com/team/hr-system',
+    status: 'completed',
+    lastHandler: {
+      name: 'Budi Santoso',
+      email: 'budi.santoso@company.com',
+    },
+    updatedAt: new Date('2025-01-10'),
+    createdAt: new Date('2024-06-20'),
+    tags: ['Vue.js', 'Laravel', 'MySQL'],
+  },
+  {
+    id: '4',
+    name: 'Learning Management System',
+    description: 'Platform pembelajaran online dengan video courses, quizzes, dan sertifikasi.',
+    link: 'https://github.com/team/lms-platform',
+    status: 'on-hold',
+    lastHandler: {
+      name: 'Dewi Anggraini',
+      email: 'dewi.ang@company.com',
+    },
+    updatedAt: new Date('2025-01-05'),
+    createdAt: new Date('2024-08-10'),
+    tags: ['Next.js', 'Prisma', 'AWS'],
+  },
+  {
+    id: '5',
+    name: 'Inventory Tracker',
+    description: 'Aplikasi tracking inventory dengan barcode scanner dan real-time stock updates.',
+    link: 'https://github.com/team/inventory-tracker',
+    status: 'archived',
+    lastHandler: {
+      name: 'Reza Firmansyah',
+      email: 'reza.f@company.com',
+    },
+    updatedAt: new Date('2024-12-20'),
+    createdAt: new Date('2024-03-15'),
+    tags: ['Flutter', 'Supabase'],
+  },
+  {
+    id: '6',
+    name: 'Social Media Dashboard',
+    description: 'Dashboard analytics untuk multiple social media platforms dengan reporting.',
+    link: 'https://github.com/team/social-dashboard',
+    status: 'active',
+    lastHandler: {
+      name: 'Maya Putri',
+      email: 'maya.putri@company.com',
+    },
+    updatedAt: new Date('2025-01-18'),
+    createdAt: new Date('2024-10-05'),
+    tags: ['React', 'D3.js', 'Python'],
+  },
+];
