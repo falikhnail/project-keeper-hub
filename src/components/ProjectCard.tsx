@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { ExternalLink, User, Mail, Calendar, MoreHorizontal } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ExternalLink, User, Mail, Calendar, MoreHorizontal, Eye } from 'lucide-react';
 import { Project } from '@/types/project';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -28,6 +30,7 @@ const statusConfig = {
 };
 
 export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardProps) => {
+  const navigate = useNavigate();
   const status = statusConfig[project.status];
   const initials = project.lastHandler.name
     .split(' ')
@@ -55,7 +58,10 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
                 {status.label}
               </Badge>
             </div>
-            <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
+            <h3 
+              onClick={() => navigate(`/project/${project.id}`)}
+              className="cursor-pointer text-lg font-semibold text-foreground transition-colors group-hover:text-primary hover:underline"
+            >
               {project.name}
             </h3>
           </div>
@@ -70,7 +76,12 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate(`/project/${project.id}`)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(project)}>Edit</DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => onDelete(project.id)}
                 className="text-destructive focus:text-destructive"

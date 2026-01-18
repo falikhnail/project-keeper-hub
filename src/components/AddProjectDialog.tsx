@@ -45,15 +45,27 @@ export const AddProjectDialog = ({
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    const handler = {
+      name: formData.handlerName,
+      email: formData.handlerEmail,
+    };
+
     onAdd({
       name: formData.name,
       description: formData.description,
       link: formData.link,
       status: formData.status,
-      lastHandler: {
-        name: formData.handlerName,
-        email: formData.handlerEmail,
-      },
+      lastHandler: handler,
+      allHandlers: [handler],
+      activities: [
+        {
+          id: crypto.randomUUID(),
+          type: 'created',
+          description: 'Project created',
+          handler: handler,
+          timestamp: new Date(),
+        },
+      ],
       tags: formData.tags
         .split(',')
         .map((t) => t.trim())
