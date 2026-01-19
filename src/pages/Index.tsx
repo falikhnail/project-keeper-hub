@@ -7,6 +7,8 @@ import { ProjectCard } from '@/components/ProjectCard';
 import { AddProjectDialog } from '@/components/AddProjectDialog';
 import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
+import { KanbanBoard } from '@/components/KanbanBoard';
+import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,6 +18,7 @@ const Index = () => {
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const { toast } = useToast();
 
   // Stats
@@ -106,6 +109,36 @@ const Index = () => {
     });
   };
 
+  const handleStatusChange = (projectId: string, newStatus: ProjectStatus) => {
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              status: newStatus,
+              updatedAt: new Date(),
+              activities: [
+                {
+                  id: crypto.randomUUID(),
+                  type: 'status_changed' as const,
+                  description: `Status changed to ${newStatus}`,
+                  handler: p.lastHandler,
+                  timestamp: new Date(),
+                  oldValue: p.status,
+                  newValue: newStatus,
+                },
+                ...p.activities,
+              ],
+            }
+          : p
+      )
+    );
+    toast({
+      title: 'Status Updated',
+      description: `Project status changed to ${newStatus}.`,
+    });
+  };
+
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingProject(null);
@@ -154,7 +187,9 @@ const Index = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
+                className="flex items-center gap-3"
               >
+                <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                 <Button onClick={() => setDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add Project
@@ -214,39 +249,48 @@ const Index = () => {
             />
           </motion.div>
 
-          {/* Projects Grid */}
-          {filteredProjects.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredProjects.map((project, index) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={index}
-                  onEdit={handleEditProject}
-                  onDelete={handleDeleteProject}
-                />
-              ))}
-            </div>
+          {/* Projects View */}
+          {viewMode === 'grid' ? (
+            filteredProjects.length > 0 ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredProjects.map((project, index) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    index={index}
+                    onEdit={handleEditProject}
+                    onDelete={handleDeleteProject}
+                  />
+                ))}
+              </div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 py-16"
+              >
+                <FolderGit2 className="mb-4 h-12 w-12 text-muted-foreground" />
+                <h3 className="mb-2 text-lg font-semibold text-foreground">
+                  No projects found
+                </h3>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  {searchQuery || statusFilters.length > 0
+                    ? 'Try adjusting your filters'
+                    : 'Get started by adding your first project'}
+                </p>
+                <Button onClick={() => setDialogOpen(true)} variant="outline" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Project
+                </Button>
+              </motion.div>
+            )
           ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 py-16"
-            >
-              <FolderGit2 className="mb-4 h-12 w-12 text-muted-foreground" />
-              <h3 className="mb-2 text-lg font-semibold text-foreground">
-                No projects found
-              </h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                {searchQuery || statusFilters.length > 0
-                  ? 'Try adjusting your filters'
-                  : 'Get started by adding your first project'}
-              </p>
-              <Button onClick={() => setDialogOpen(true)} variant="outline" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Project
-              </Button>
-            </motion.div>
+            <KanbanBoard
+              projects={filteredProjects}
+              onStatusChange={handleStatusChange}
+              onEdit={handleEditProject}
+              onDelete={handleDeleteProject}
+            />
           )}
         </main>
       </div>
