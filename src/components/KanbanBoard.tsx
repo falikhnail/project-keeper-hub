@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { ExternalLink, User, GripVertical, MoreHorizontal, Eye } from 'lucide-react';
-import { Project, ProjectStatus } from '@/types/project';
+import { Project } from '@/hooks/useProjects';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -14,6 +14,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
+
+type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 
 interface KanbanBoardProps {
   projects: Project[];
@@ -29,13 +31,6 @@ const columns: { id: ProjectStatus; title: string; color: string }[] = [
   { id: 'archived', title: 'Archived', color: 'bg-muted-foreground' },
 ];
 
-const statusConfig = {
-  active: { label: 'Active', className: 'bg-success/20 text-success border-success/30' },
-  completed: { label: 'Completed', className: 'bg-primary/20 text-primary border-primary/30' },
-  'on-hold': { label: 'On Hold', className: 'bg-warning/20 text-warning border-warning/30' },
-  archived: { label: 'Archived', className: 'bg-muted text-muted-foreground border-border' },
-};
-
 const KanbanCard = ({
   project,
   index,
@@ -48,11 +43,12 @@ const KanbanCard = ({
   onDelete: (id: string) => void;
 }) => {
   const navigate = useNavigate();
-  const initials = project.lastHandler.name
-    .split(' ')
+  const handler = project.last_handler;
+  const initials = handler?.display_name
+    ?.split(' ')
     .map((n) => n[0])
     .join('')
-    .toUpperCase();
+    .toUpperCase() || handler?.email?.[0].toUpperCase() || '?';
 
   return (
     <Draggable draggableId={project.id} index={index}>
@@ -110,7 +106,7 @@ const KanbanCard = ({
 
             {/* Description */}
             <p className="mb-3 line-clamp-2 text-xs text-muted-foreground">
-              {project.description}
+              {project.description || 'No description'}
             </p>
 
             {/* Tags */}
@@ -133,16 +129,18 @@ const KanbanCard = ({
             )}
 
             {/* Link */}
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mb-3 flex items-center gap-1.5 text-xs text-primary transition-colors hover:text-primary/80"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ExternalLink className="h-3 w-3" />
-              <span className="truncate font-mono text-[10px]">{project.link}</span>
-            </a>
+            {project.link && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-3 flex items-center gap-1.5 text-xs text-primary transition-colors hover:text-primary/80"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink className="h-3 w-3" />
+                <span className="truncate font-mono text-[10px]">{project.link}</span>
+              </a>
+            )}
 
             {/* Handler */}
             <div className="flex items-center gap-2">
@@ -153,7 +151,7 @@ const KanbanCard = ({
               </Avatar>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <User className="h-3 w-3" />
-                <span className="truncate">{project.lastHandler.name}</span>
+                <span className="truncate">{handler?.display_name || 'Unknown'}</span>
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ExternalLink, User, Mail, Calendar, MoreHorizontal, Eye } from 'lucide-react';
-import { Project } from '@/types/project';
+import { Project } from '@/hooks/useProjects';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -32,11 +32,12 @@ const statusConfig = {
 export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardProps) => {
   const navigate = useNavigate();
   const status = statusConfig[project.status];
-  const initials = project.lastHandler.name
-    .split(' ')
+  const handler = project.last_handler;
+  const initials = handler?.display_name
+    ?.split(' ')
     .map((n) => n[0])
     .join('')
-    .toUpperCase();
+    .toUpperCase() || handler?.email?.[0].toUpperCase() || '?';
 
   return (
     <motion.div
@@ -94,7 +95,7 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
 
         {/* Description */}
         <p className="mb-4 line-clamp-2 flex-1 text-sm text-muted-foreground">
-          {project.description}
+          {project.description || 'No description'}
         </p>
 
         {/* Tags */}
@@ -112,15 +113,17 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
         )}
 
         {/* Link */}
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mb-4 flex items-center gap-2 text-sm text-primary transition-colors hover:text-primary/80"
-        >
-          <ExternalLink className="h-4 w-4" />
-          <span className="truncate font-mono text-xs">{project.link}</span>
-        </a>
+        {project.link && (
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-4 flex items-center gap-2 text-sm text-primary transition-colors hover:text-primary/80"
+          >
+            <ExternalLink className="h-4 w-4" />
+            <span className="truncate font-mono text-xs">{project.link}</span>
+          </a>
+        )}
 
         {/* Divider */}
         <div className="my-3 h-px bg-border" />
@@ -136,17 +139,17 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                 <User className="h-3 w-3 text-muted-foreground" />
-                <span className="truncate">{project.lastHandler.name}</span>
+                <span className="truncate">{handler?.display_name || 'Unknown'}</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Mail className="h-3 w-3" />
-                <span className="truncate">{project.lastHandler.email}</span>
+                <span className="truncate">{handler?.email || 'No email'}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="h-3 w-3" />
-            <span>{format(project.updatedAt, 'dd MMM yyyy', { locale: id })}</span>
+            <span>{format(project.updated_at, 'dd MMM yyyy', { locale: id })}</span>
           </div>
         </div>
       </div>
