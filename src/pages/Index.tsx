@@ -1,48 +1,59 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle } from 'lucide-react';
-import { Project, ProjectStatus } from '@/types/project';
-import { mockProjects } from '@/data/mockProjects';
+import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
 import { ProjectCard } from '@/components/ProjectCard';
-import { AddProjectDialog } from '@/components/AddProjectDialog';
+import { AddProjectDialogDB } from '@/components/AddProjectDialogDB';
 import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+
+type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 
 const Index = () => {
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const { profile, signOut } = useAuth();
+  const { projects, loading, addProject, updateProject, updateProjectStatus, deleteProject } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const { toast } = useToast();
 
   // Stats
   const stats = useMemo(() => {
+    const uniqueHandlers = new Set<string>();
+    projects.forEach((p) => {
+      if (p.last_handler?.email) uniqueHandlers.add(p.last_handler.email);
+    });
     return {
       total: projects.length,
       active: projects.filter((p) => p.status === 'active').length,
       completed: projects.filter((p) => p.status === 'completed').length,
-      handlers: [...new Set(projects.map((p) => p.lastHandler.email))].length,
+      handlers: uniqueHandlers.size,
     };
   }, [projects]);
 
   // Filtered projects
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
-      // Search filter
       const matchesSearch =
         searchQuery === '' ||
         project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.lastHandler.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.lastHandler.email.toLowerCase().includes(searchQuery.toLowerCase());
+        (project.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (project.last_handler?.display_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (project.last_handler?.email || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Status filter
       const matchesStatus =
         statusFilters.length === 0 || statusFilters.includes(project.status);
 
@@ -61,37 +72,14 @@ const Index = () => {
     setStatusFilters([]);
   };
 
-  const handleAddProject = (
-    projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
-  ) => {
+  const handleAddProject = async (input: ProjectInput) => {
     if (editingProject) {
-      // Update existing project
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === editingProject.id
-            ? { ...p, ...projectData, updatedAt: new Date() }
-            : p
-        )
-      );
-      toast({
-        title: 'Project Updated',
-        description: `${projectData.name} has been updated successfully.`,
-      });
+      await updateProject(editingProject.id, input);
     } else {
-      // Add new project
-      const newProject: Project = {
-        ...projectData,
-        id: crypto.randomUUID(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      setProjects((prev) => [newProject, ...prev]);
-      toast({
-        title: 'Project Added',
-        description: `${projectData.name} has been added successfully.`,
-      });
+      await addProject(input);
     }
     setEditingProject(null);
+    setDialogOpen(false);
   };
 
   const handleEditProject = (project: Project) => {
@@ -99,44 +87,12 @@ const Index = () => {
     setDialogOpen(true);
   };
 
-  const handleDeleteProject = (id: string) => {
-    const project = projects.find((p) => p.id === id);
-    setProjects((prev) => prev.filter((p) => p.id !== id));
-    toast({
-      title: 'Project Deleted',
-      description: `${project?.name} has been removed.`,
-      variant: 'destructive',
-    });
+  const handleDeleteProject = async (id: string) => {
+    await deleteProject(id);
   };
 
-  const handleStatusChange = (projectId: string, newStatus: ProjectStatus) => {
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === projectId
-          ? {
-              ...p,
-              status: newStatus,
-              updatedAt: new Date(),
-              activities: [
-                {
-                  id: crypto.randomUUID(),
-                  type: 'status_changed' as const,
-                  description: `Status changed to ${newStatus}`,
-                  handler: p.lastHandler,
-                  timestamp: new Date(),
-                  oldValue: p.status,
-                  newValue: newStatus,
-                },
-                ...p.activities,
-              ],
-            }
-          : p
-      )
-    );
-    toast({
-      title: 'Status Updated',
-      description: `Project status changed to ${newStatus}.`,
-    });
+  const handleStatusChange = async (projectId: string, newStatus: ProjectStatus) => {
+    await updateProjectStatus(projectId, newStatus);
   };
 
   const handleCloseDialog = () => {
@@ -144,11 +100,19 @@ const Index = () => {
     setEditingProject(null);
   };
 
-  useEffect(() => {
-    if (editingProject) {
-      setDialogOpen(true);
-    }
-  }, [editingProject]);
+  const userInitials = profile?.display_name
+    ?.split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase() || profile?.email?.[0].toUpperCase() || 'U';
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -194,6 +158,30 @@ const Index = () => {
                   <Plus className="h-4 w-4" />
                   Add Project
                 </Button>
+                
+                {/* User Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <Avatar className="h-10 w-10 border border-border">
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {userInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-2 py-1.5">
+                      <p className="text-sm font-medium">{profile?.display_name}</p>
+                      <p className="text-xs text-muted-foreground">{profile?.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </motion.div>
             </div>
           </div>
@@ -296,10 +284,10 @@ const Index = () => {
       </div>
 
       {/* Add/Edit Dialog */}
-      <AddProjectDialog
+      <AddProjectDialogDB
         open={dialogOpen}
         onClose={handleCloseDialog}
-        onAdd={handleAddProject}
+        onSave={handleAddProject}
         editingProject={editingProject}
       />
     </div>
