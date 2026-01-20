@@ -7,7 +7,7 @@ import {
   MessageSquare,
   Clock
 } from 'lucide-react';
-import { ProjectActivity, ActivityType } from '@/types/project';
+import { ProjectActivity } from '@/hooks/useProjects';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { format, formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -15,6 +15,8 @@ import { id } from 'date-fns/locale';
 interface ActivityTimelineProps {
   activities: ProjectActivity[];
 }
+
+type ActivityType = ProjectActivity['type'];
 
 const activityConfig: Record<ActivityType, { icon: typeof Plus; color: string; bg: string }> = {
   created: { icon: Plus, color: 'text-success', bg: 'bg-success/20' },
@@ -30,11 +32,13 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
       {activities.map((activity, index) => {
         const config = activityConfig[activity.type];
         const Icon = config.icon;
-        const initials = activity.handler.name
+        const handlerName = activity.handler?.display_name || activity.handler?.email || 'Unknown';
+        const initials = handlerName
           .split(' ')
           .map((n) => n[0])
           .join('')
-          .toUpperCase();
+          .toUpperCase()
+          .slice(0, 2);
 
         return (
           <motion.div
@@ -70,7 +74,7 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-xs text-muted-foreground">
-                    {activity.handler.name}
+                    {handlerName}
                   </span>
                 </div>
 
@@ -85,27 +89,27 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
               </div>
 
               {/* Status change badges */}
-              {activity.type === 'status_changed' && activity.oldValue && activity.newValue && (
+              {activity.type === 'status_changed' && activity.old_value && activity.new_value && (
                 <div className="mt-2 flex items-center gap-2 text-xs">
                   <span className="rounded-md bg-muted px-2 py-0.5 text-muted-foreground">
-                    {activity.oldValue}
+                    {activity.old_value}
                   </span>
                   <ArrowRightLeft className="h-3 w-3 text-muted-foreground" />
                   <span className="rounded-md bg-primary/20 px-2 py-0.5 text-primary">
-                    {activity.newValue}
+                    {activity.new_value}
                   </span>
                 </div>
               )}
 
               {/* Handler change */}
-              {activity.type === 'handler_changed' && activity.oldValue && activity.newValue && (
+              {activity.type === 'handler_changed' && activity.old_value && activity.new_value && (
                 <div className="mt-2 flex items-center gap-2 text-xs">
                   <span className="rounded-md bg-muted px-2 py-0.5 text-muted-foreground">
-                    {activity.oldValue}
+                    {activity.old_value}
                   </span>
                   <ArrowRightLeft className="h-3 w-3 text-muted-foreground" />
                   <span className="rounded-md bg-accent/20 px-2 py-0.5 text-accent">
-                    {activity.newValue}
+                    {activity.new_value}
                   </span>
                 </div>
               )}
