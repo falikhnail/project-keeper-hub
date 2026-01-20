@@ -8,14 +8,17 @@ import {
   Users, 
   Activity,
   FolderGit2,
-  Loader2
+  Loader2,
+  MessageSquare
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
+import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { HandlersList } from '@/components/HandlersList';
 import { AddHandlerDialog } from '@/components/AddHandlerDialog';
+import { CommentsSection } from '@/components/CommentsSection';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -29,7 +32,8 @@ const statusConfig = {
 const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles } = useProjects();
+  const { profile } = useAuth();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment } = useProjects();
 
   if (loading) {
     return (
@@ -152,30 +156,50 @@ const ProjectDetail = () => {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <div className="rounded-xl border border-border bg-card p-6">
-                <div className="mb-6 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-primary/10 p-2"><Users className="h-5 w-5 text-primary" /></div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-foreground">Project Handlers</h2>
-                      <p className="text-sm text-muted-foreground">Team members</p>
+            <div className="space-y-8">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <div className="mb-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-primary/10 p-2"><Users className="h-5 w-5 text-primary" /></div>
+                      <div>
+                        <h2 className="text-lg font-semibold text-foreground">Project Handlers</h2>
+                        <p className="text-sm text-muted-foreground">Team members</p>
+                      </div>
                     </div>
+                    <AddHandlerDialog
+                      existingHandlerIds={project.all_handlers.map((h) => h.id)}
+                      onAddHandler={(profileId) => addHandler(project.id, profileId)}
+                      fetchAllProfiles={fetchAllProfiles}
+                    />
                   </div>
-                  <AddHandlerDialog
-                    existingHandlerIds={project.all_handlers.map((h) => h.id)}
-                    onAddHandler={(profileId) => addHandler(project.id, profileId)}
-                    fetchAllProfiles={fetchAllProfiles}
+                  <HandlersList
+                    handlers={project.all_handlers}
+                    currentHandler={project.last_handler}
+                    onRemoveHandler={(profileId) => removeHandler(project.id, profileId)}
+                    canRemove
                   />
                 </div>
-                <HandlersList
-                  handlers={project.all_handlers}
-                  currentHandler={project.last_handler}
-                  onRemoveHandler={(profileId) => removeHandler(project.id, profileId)}
-                  canRemove
-                />
-              </div>
-            </motion.div>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2"><MessageSquare className="h-5 w-5 text-primary" /></div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-foreground">Comments</h2>
+                      <p className="text-sm text-muted-foreground">{project.comments.length} notes</p>
+                    </div>
+                  </div>
+                  <CommentsSection
+                    comments={project.comments}
+                    currentUserProfileId={profile?.id}
+                    onAddComment={(content) => addComment(project.id, content)}
+                    onDeleteComment={deleteComment}
+                  />
+                </div>
+              </motion.div>
+            </div>
           </div>
         </main>
       </div>
