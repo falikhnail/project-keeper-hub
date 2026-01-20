@@ -20,6 +20,14 @@ export interface ProjectActivity {
   new_value: string | null;
 }
 
+export interface ProjectComment {
+  id: string;
+  content: string;
+  author: Profile | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -31,6 +39,7 @@ export interface Project {
   last_handler: Profile | null;
   all_handlers: Profile[];
   activities: ProjectActivity[];
+  comments: ProjectComment[];
   created_at: Date;
   updated_at: Date;
 }
@@ -80,6 +89,13 @@ export const useProjects = () => {
             .eq('project_id', project.id)
             .order('created_at', { ascending: false });
 
+          // Fetch comments
+          const { data: commentsData } = await supabase
+            .from('project_comments')
+            .select('*, profiles(*)')
+            .eq('project_id', project.id)
+            .order('created_at', { ascending: false });
+
           const handlers = handlersData?.map((h) => h.profiles as unknown as Profile) || [];
           const activities: ProjectActivity[] = (activitiesData || []).map((a) => ({
             id: a.id,
@@ -89,6 +105,13 @@ export const useProjects = () => {
             timestamp: new Date(a.created_at),
             old_value: a.old_value,
             new_value: a.new_value,
+          }));
+          const comments: ProjectComment[] = (commentsData || []).map((c) => ({
+            id: c.id,
+            content: c.content,
+            author: c.profiles as unknown as Profile,
+            created_at: new Date(c.created_at),
+            updated_at: new Date(c.updated_at),
           }));
 
           return {
@@ -102,6 +125,7 @@ export const useProjects = () => {
             last_handler: project.last_handler_profile as unknown as Profile,
             all_handlers: handlers,
             activities,
+            comments,
             created_at: new Date(project.created_at),
             updated_at: new Date(project.updated_at),
           };
@@ -436,6 +460,65 @@ export const useProjects = () => {
     return data || [];
   };
 
+  const addComment = async (projectId: string, content: string) => {
+    if (!profile) return;
+
+    try {
+      const { error } = await supabase.from('project_comments').insert({
+        project_id: projectId,
+        author_id: profile.id,
+        content: content.trim(),
+      });
+
+      if (error) throw error;
+
+      // Also add activity
+      await supabase.from('project_activities').insert({
+        project_id: projectId,
+        type: 'comment',
+        description: 'Added a comment',
+        handler_id: profile.id,
+      });
+
+      toast({
+        title: 'Comment Added',
+        description: 'Your comment has been posted.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error adding comment',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteComment = async (commentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_comments')
+        .delete()
+        .eq('id', commentId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Comment Deleted',
+        description: 'Your comment has been removed.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting comment',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     projects,
     loading,
@@ -446,6 +529,8 @@ export const useProjects = () => {
     addHandler,
     removeHandler,
     fetchAllProfiles,
+    addComment,
+    deleteComment,
     refetch: fetchProjects,
   };
 };
