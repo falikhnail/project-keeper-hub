@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { HandlersList } from '@/components/HandlersList';
+import { AddHandlerDialog } from '@/components/AddHandlerDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -28,7 +29,7 @@ const statusConfig = {
 const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
-  const { projects, loading } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles } = useProjects();
 
   if (loading) {
     return (
@@ -153,14 +154,26 @@ const ProjectDetail = () => {
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <div className="rounded-xl border border-border bg-card p-6">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="rounded-lg bg-primary/10 p-2"><Users className="h-5 w-5 text-primary" /></div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-foreground">Project Handlers</h2>
-                    <p className="text-sm text-muted-foreground">Team members</p>
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2"><Users className="h-5 w-5 text-primary" /></div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-foreground">Project Handlers</h2>
+                      <p className="text-sm text-muted-foreground">Team members</p>
+                    </div>
                   </div>
+                  <AddHandlerDialog
+                    existingHandlerIds={project.all_handlers.map((h) => h.id)}
+                    onAddHandler={(profileId) => addHandler(project.id, profileId)}
+                    fetchAllProfiles={fetchAllProfiles}
+                  />
                 </div>
-                <HandlersList handlers={project.all_handlers} currentHandler={project.last_handler} />
+                <HandlersList
+                  handlers={project.all_handlers}
+                  currentHandler={project.last_handler}
+                  onRemoveHandler={(profileId) => removeHandler(project.id, profileId)}
+                  canRemove
+                />
               </div>
             </motion.div>
           </div>
