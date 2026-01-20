@@ -1,23 +1,25 @@
 import { motion } from 'framer-motion';
 import { Mail, Crown } from 'lucide-react';
-import { ProjectHandler } from '@/types/project';
+import { Profile } from '@/hooks/useProjects';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface HandlersListProps {
-  handlers: ProjectHandler[];
-  currentHandler: ProjectHandler;
+  handlers: Profile[];
+  currentHandler: Profile | null;
 }
 
 export const HandlersList = ({ handlers, currentHandler }: HandlersListProps) => {
   return (
     <div className="space-y-3">
       {handlers.map((handler, index) => {
-        const initials = handler.name
+        const displayName = handler.display_name || handler.email || 'Unknown';
+        const initials = displayName
           .split(' ')
           .map((n) => n[0])
           .join('')
-          .toUpperCase();
-        const isCurrent = handler.email === currentHandler.email;
+          .toUpperCase()
+          .slice(0, 2);
+        const isCurrent = currentHandler && handler.id === currentHandler.id;
 
         return (
           <motion.div
@@ -47,7 +49,7 @@ export const HandlersList = ({ handlers, currentHandler }: HandlersListProps) =>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-foreground">
-                  {handler.name}
+                  {displayName}
                 </span>
                 {isCurrent && (
                   <span className="rounded-md bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
