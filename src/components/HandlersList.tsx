@@ -1,14 +1,32 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Crown } from 'lucide-react';
+import { Mail, Crown, X, Loader2 } from 'lucide-react';
 import { Profile } from '@/hooks/useProjects';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 
 interface HandlersListProps {
   handlers: Profile[];
   currentHandler: Profile | null;
+  onRemoveHandler?: (profileId: string) => Promise<void>;
+  canRemove?: boolean;
 }
 
-export const HandlersList = ({ handlers, currentHandler }: HandlersListProps) => {
+export const HandlersList = ({
+  handlers,
+  currentHandler,
+  onRemoveHandler,
+  canRemove = false,
+}: HandlersListProps) => {
+  const [removing, setRemoving] = useState<string | null>(null);
+
+  const handleRemove = async (profileId: string) => {
+    if (!onRemoveHandler) return;
+    setRemoving(profileId);
+    await onRemoveHandler(profileId);
+    setRemoving(null);
+  };
+
   return (
     <div className="space-y-3">
       {handlers.map((handler, index) => {
@@ -20,10 +38,11 @@ export const HandlersList = ({ handlers, currentHandler }: HandlersListProps) =>
           .toUpperCase()
           .slice(0, 2);
         const isCurrent = currentHandler && handler.id === currentHandler.id;
+        const isOnlyHandler = handlers.length === 1;
 
         return (
           <motion.div
-            key={handler.email}
+            key={handler.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -62,6 +81,24 @@ export const HandlersList = ({ handlers, currentHandler }: HandlersListProps) =>
                 <span className="truncate">{handler.email}</span>
               </div>
             </div>
+
+            {/* Remove button */}
+            {canRemove && !isOnlyHandler && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+                onClick={() => handleRemove(handler.id)}
+                disabled={removing === handler.id}
+                title="Remove handler"
+              >
+                {removing === handler.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                )}
+              </Button>
+            )}
           </motion.div>
         );
       })}

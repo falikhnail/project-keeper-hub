@@ -321,6 +321,121 @@ export const useProjects = () => {
     }
   };
 
+  const addHandler = async (projectId: string, profileId: string) => {
+    if (!profile) return;
+
+    try {
+      // Check if handler already exists
+      const { data: existing } = await supabase
+        .from('project_handlers')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('profile_id', profileId)
+        .single();
+
+      if (existing) {
+        toast({
+          title: 'Handler already assigned',
+          description: 'This user is already a handler for this project.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Get the profile being added
+      const { data: handlerProfile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', profileId)
+        .single();
+
+      const { error } = await supabase.from('project_handlers').insert({
+        project_id: projectId,
+        profile_id: profileId,
+      });
+
+      if (error) throw error;
+
+      // Add activity
+      await supabase.from('project_activities').insert({
+        project_id: projectId,
+        type: 'handler_changed',
+        description: `Added ${handlerProfile?.display_name || handlerProfile?.email} as handler`,
+        handler_id: profile.id,
+        new_value: handlerProfile?.display_name || handlerProfile?.email,
+      });
+
+      toast({
+        title: 'Handler Added',
+        description: `${handlerProfile?.display_name || handlerProfile?.email} has been added to the project.`,
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error adding handler',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const removeHandler = async (projectId: string, profileId: string) => {
+    if (!profile) return;
+
+    try {
+      // Get the profile being removed
+      const { data: handlerProfile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', profileId)
+        .single();
+
+      const { error } = await supabase
+        .from('project_handlers')
+        .delete()
+        .eq('project_id', projectId)
+        .eq('profile_id', profileId);
+
+      if (error) throw error;
+
+      // Add activity
+      await supabase.from('project_activities').insert({
+        project_id: projectId,
+        type: 'handler_changed',
+        description: `Removed ${handlerProfile?.display_name || handlerProfile?.email} from handlers`,
+        handler_id: profile.id,
+        old_value: handlerProfile?.display_name || handlerProfile?.email,
+      });
+
+      toast({
+        title: 'Handler Removed',
+        description: `${handlerProfile?.display_name || handlerProfile?.email} has been removed from the project.`,
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error removing handler',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const fetchAllProfiles = async (): Promise<Profile[]> => {
+    const { data, error } = await supabase.from('profiles').select('*');
+    if (error) {
+      toast({
+        title: 'Error fetching profiles',
+        description: error.message,
+        variant: 'destructive',
+      });
+      return [];
+    }
+    return data || [];
+  };
+
   return {
     projects,
     loading,
@@ -328,6 +443,9 @@ export const useProjects = () => {
     updateProject,
     updateProjectStatus,
     deleteProject,
+    addHandler,
+    removeHandler,
+    fetchAllProfiles,
     refetch: fetchProjects,
   };
 };
