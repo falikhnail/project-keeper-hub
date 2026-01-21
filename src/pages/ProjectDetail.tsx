@@ -194,7 +194,7 @@ const ProjectDetail = () => {
                   <CommentsSection
                     comments={project.comments}
                     currentUserProfileId={profile?.id}
-                    onAddComment={(content) => addComment(project.id, content)}
+                    onAddComment={(content, mentions, parentId) => addComment(project.id, content, mentions, parentId)}
                     onDeleteComment={deleteComment}
                     onUpdateComment={updateComment}
                   />

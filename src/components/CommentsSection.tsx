@@ -1,19 +1,17 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MessageSquare, Send, Trash2, Loader2, Pencil, X, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MessageSquare, Send, Loader2 } from 'lucide-react';
 import { ProjectComment, Profile } from '@/hooks/useProjects';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { formatDistanceToNow } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { MentionInput } from './MentionInput';
+import { CommentThread } from './CommentThread';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CommentsSectionProps {
   comments: ProjectComment[];
   currentUserProfileId: string | undefined;
-  onAddComment: (content: string) => Promise<void>;
+  onAddComment: (content: string, mentions: string[], parentId?: string) => Promise<void>;
   onDeleteComment: (commentId: string) => Promise<void>;
-  onUpdateComment: (commentId: string, content: string) => Promise<void>;
+  onUpdateComment: (commentId: string, content: string, mentions: string[]) => Promise<void>;
 }
 
 export const CommentsSection = ({
@@ -24,56 +22,54 @@ export const CommentsSection = ({
   onUpdateComment,
 }: CommentsSectionProps) => {
   const [newComment, setNewComment] = useState('');
+  const [mentions, setMentions] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState('');
-  const [updating, setUpdating] = useState(false);
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      const { data } = await supabase.from('profiles').select('*');
+      if (data) {
+        setAllProfiles(data);
+      }
+    };
+    fetchProfiles();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || submitting) return;
 
     setSubmitting(true);
-    await onAddComment(newComment);
+    await onAddComment(newComment, mentions);
     setNewComment('');
+    setMentions([]);
     setSubmitting(false);
   };
 
-  const handleDelete = async (commentId: string) => {
-    setDeleting(commentId);
-    await onDeleteComment(commentId);
-    setDeleting(null);
+  const handleAddReply = async (content: string, replyMentions: string[], parentId: string) => {
+    await onAddComment(content, replyMentions, parentId);
   };
 
-  const handleStartEdit = (comment: ProjectComment) => {
-    setEditingId(comment.id);
-    setEditContent(comment.content);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditContent('');
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingId || !editContent.trim() || updating) return;
-
-    setUpdating(true);
-    await onUpdateComment(editingId, editContent);
-    setEditingId(null);
-    setEditContent('');
-    setUpdating(false);
-  };
+  // Separate top-level comments and replies
+  const topLevelComments = comments.filter((c) => !c.parentCommentId);
+  const getReplies = (commentId: string) =>
+    comments.filter((c) => c.parentCommentId === commentId).sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
 
   return (
     <div className="space-y-6">
       {/* Comment form */}
       <form onSubmit={handleSubmit} className="space-y-3">
-        <Textarea
-          placeholder="Write a comment..."
+        <MentionInput
           value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
+          onChange={(val, newMentions) => {
+            setNewComment(val);
+            setMentions(newMentions);
+          }}
+          placeholder="Write a comment... Use @ to mention team members"
+          profiles={allProfiles}
           className="min-h-[80px] resize-none"
         />
         <div className="flex justify-end">
@@ -95,127 +91,26 @@ export const CommentsSection = ({
 
       {/* Comments list */}
       <div className="space-y-4">
-        {comments.length === 0 ? (
+        {topLevelComments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
             <MessageSquare className="mb-2 h-8 w-8" />
             <p className="text-sm">No comments yet</p>
             <p className="text-xs">Be the first to leave a note!</p>
           </div>
         ) : (
-          comments.map((comment, index) => {
-            const authorName = comment.author?.display_name || comment.author?.email || 'Unknown';
-            const initials = authorName
-              .split(' ')
-              .map((n) => n[0])
-              .join('')
-              .toUpperCase()
-              .slice(0, 2);
-            const isOwner = currentUserProfileId && comment.author?.id === currentUserProfileId;
-            const isEditing = editingId === comment.id;
-
-            return (
-              <motion.div
-                key={comment.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="group rounded-lg border border-border bg-card p-4"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1">
-                    <Avatar className="h-8 w-8 border border-border">
-                      <AvatarFallback className="bg-secondary text-xs font-medium">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground">
-                          {authorName}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(comment.created_at, {
-                            addSuffix: true,
-                            locale: id,
-                          })}
-                        </span>
-                        {comment.updated_at > comment.created_at && (
-                          <span className="text-xs text-muted-foreground">(edited)</span>
-                        )}
-                      </div>
-                      {isEditing ? (
-                        <div className="mt-2 space-y-2">
-                          <Textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            className="min-h-[60px] resize-none"
-                            autoFocus
-                          />
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={handleSaveEdit}
-                              disabled={!editContent.trim() || updating}
-                              className="gap-1"
-                            >
-                              {updating ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                              ) : (
-                                <Check className="h-3 w-3" />
-                              )}
-                              Save
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={handleCancelEdit}
-                              disabled={updating}
-                              className="gap-1"
-                            >
-                              <X className="h-3 w-3" />
-                              Cancel
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
-                          {comment.content}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {isOwner && !isEditing && (
-                    <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleStartEdit(comment)}
-                        title="Edit comment"
-                      >
-                        <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleDelete(comment.id)}
-                        disabled={deleting === comment.id}
-                        title="Delete comment"
-                      >
-                        {deleting === comment.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })
+          topLevelComments.map((comment, index) => (
+            <CommentThread
+              key={comment.id}
+              comment={comment}
+              replies={getReplies(comment.id)}
+              allProfiles={allProfiles}
+              currentUserProfileId={currentUserProfileId}
+              onAddReply={handleAddReply}
+              onDeleteComment={onDeleteComment}
+              onUpdateComment={onUpdateComment}
+              index={index}
+            />
+          ))
         )}
       </div>
     </div>
