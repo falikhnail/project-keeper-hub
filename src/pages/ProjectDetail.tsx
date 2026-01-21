@@ -33,7 +33,7 @@ const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment } = useProjects();
 
   if (loading) {
     return (
@@ -196,6 +196,7 @@ const ProjectDetail = () => {
                     currentUserProfileId={profile?.id}
                     onAddComment={(content) => addComment(project.id, content)}
                     onDeleteComment={deleteComment}
+                    onUpdateComment={updateComment}
                   />
                 </div>
               </motion.div>

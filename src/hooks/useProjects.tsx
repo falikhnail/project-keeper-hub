@@ -147,12 +147,17 @@ export const useProjects = () => {
   useEffect(() => {
     fetchProjects();
 
-    // Subscribe to realtime changes
+    // Subscribe to realtime changes for projects and comments
     const channel = supabase
       .channel('projects-changes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'projects' },
+        () => fetchProjects()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'project_comments' },
         () => fetchProjects()
       )
       .subscribe();
@@ -519,6 +524,30 @@ export const useProjects = () => {
     }
   };
 
+  const updateComment = async (commentId: string, content: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_comments')
+        .update({ content: content.trim() })
+        .eq('id', commentId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Comment Updated',
+        description: 'Your comment has been updated.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error updating comment',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     projects,
     loading,
@@ -531,6 +560,7 @@ export const useProjects = () => {
     fetchAllProfiles,
     addComment,
     deleteComment,
+    updateComment,
     refetch: fetchProjects,
   };
 };
