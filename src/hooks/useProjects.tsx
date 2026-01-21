@@ -26,6 +26,8 @@ export interface ProjectComment {
   author: Profile | null;
   created_at: Date;
   updated_at: Date;
+  parentCommentId: string | null;
+  mentions: string[];
 }
 
 export interface Project {
@@ -112,6 +114,8 @@ export const useProjects = () => {
             author: c.profiles as unknown as Profile,
             created_at: new Date(c.created_at),
             updated_at: new Date(c.updated_at),
+            parentCommentId: (c as any).parent_comment_id || null,
+            mentions: (c as any).mentions || [],
           }));
 
           return {
@@ -465,7 +469,7 @@ export const useProjects = () => {
     return data || [];
   };
 
-  const addComment = async (projectId: string, content: string) => {
+  const addComment = async (projectId: string, content: string, mentions: string[] = [], parentCommentId?: string) => {
     if (!profile) return;
 
     try {
@@ -473,7 +477,9 @@ export const useProjects = () => {
         project_id: projectId,
         author_id: profile.id,
         content: content.trim(),
-      });
+        mentions,
+        parent_comment_id: parentCommentId || null,
+      } as any);
 
       if (error) throw error;
 
@@ -481,13 +487,13 @@ export const useProjects = () => {
       await supabase.from('project_activities').insert({
         project_id: projectId,
         type: 'comment',
-        description: 'Added a comment',
+        description: parentCommentId ? 'Replied to a comment' : 'Added a comment',
         handler_id: profile.id,
       });
 
       toast({
-        title: 'Comment Added',
-        description: 'Your comment has been posted.',
+        title: parentCommentId ? 'Reply Added' : 'Comment Added',
+        description: parentCommentId ? 'Your reply has been posted.' : 'Your comment has been posted.',
       });
 
       fetchProjects();
@@ -524,11 +530,11 @@ export const useProjects = () => {
     }
   };
 
-  const updateComment = async (commentId: string, content: string) => {
+  const updateComment = async (commentId: string, content: string, mentions: string[] = []) => {
     try {
       const { error } = await supabase
         .from('project_comments')
-        .update({ content: content.trim() })
+        .update({ content: content.trim(), mentions } as any)
         .eq('id', commentId);
 
       if (error) throw error;

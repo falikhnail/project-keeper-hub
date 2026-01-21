@@ -98,6 +98,8 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          mentions: string[] | null
+          parent_comment_id: string | null
           project_id: string
           updated_at: string
         }
@@ -106,6 +108,8 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          mentions?: string[] | null
+          parent_comment_id?: string | null
           project_id: string
           updated_at?: string
         }
@@ -114,6 +118,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          mentions?: string[] | null
+          parent_comment_id?: string | null
           project_id?: string
           updated_at?: string
         }
@@ -123,6 +129,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "project_comments"
             referencedColumns: ["id"]
           },
           {
