@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProjects } from '@/hooks/useProjects';
 import { StatsCard } from '@/components/StatsCard';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
@@ -149,15 +150,18 @@ const Analytics = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex items-center gap-4"
+          className="mb-8 flex items-center justify-between"
         >
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">Statistik proyek dan aktivitas tim</p>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+              <p className="text-muted-foreground">Statistik proyek dan aktivitas tim</p>
+            </div>
           </div>
+          <ThemeToggle />
         </motion.div>
 
         {/* Stats Cards */}
