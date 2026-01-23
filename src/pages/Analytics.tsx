@@ -48,7 +48,7 @@ const Analytics = () => {
       let comments = 0;
 
       projects.forEach(p => {
-        p.activities.forEach(a => {
+        (p.activities || []).forEach(a => {
           const actDate = new Date(a.timestamp);
           if (actDate >= dayStart && actDate < dayEnd) {
             if (a.type === 'comment') {
@@ -75,7 +75,7 @@ const Analytics = () => {
     const handlerCounts: Record<string, { name: string; activities: number; comments: number }> = {};
 
     projects.forEach(p => {
-      p.activities.forEach(a => {
+      (p.activities || []).forEach(a => {
         if (a.handler) {
           const key = a.handler.id;
           if (!handlerCounts[key]) {
@@ -116,9 +116,9 @@ const Analytics = () => {
 
   // Summary stats
   const stats = useMemo(() => {
-    const totalActivities = projects.reduce((sum, p) => sum + p.activities.length, 0);
-    const totalComments = projects.reduce((sum, p) => sum + p.comments.length, 0);
-    const uniqueHandlers = new Set(projects.flatMap(p => p.all_handlers.map(h => h.id))).size;
+    const totalActivities = projects.reduce((sum, p) => sum + (p.activities?.length || 0), 0);
+    const totalComments = projects.reduce((sum, p) => sum + (p.comments?.length || 0), 0);
+    const uniqueHandlers = new Set(projects.flatMap(p => (p.all_handlers || []).map(h => h.id))).size;
     
     return {
       totalProjects: projects.length,
