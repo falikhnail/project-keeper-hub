@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2 } from 'lucide-react';
+import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
 import { ProjectCard } from '@/components/ProjectCard';
@@ -22,6 +23,7 @@ import {
 type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { profile, signOut } = useAuth();
   const { projects, loading, addProject, updateProject, updateProjectStatus, deleteProject } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,6 +156,10 @@ const Index = () => {
                 className="flex items-center gap-3"
               >
                 <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+                <Button variant="outline" onClick={() => navigate('/analytics')} className="gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </Button>
                 <Button onClick={() => setDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add Project
