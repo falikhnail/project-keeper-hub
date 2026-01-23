@@ -10,6 +10,7 @@ import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -155,6 +156,7 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
                 className="flex items-center gap-3"
               >
+                <ThemeToggle />
                 <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                 <Button variant="outline" onClick={() => navigate('/analytics')} className="gap-2">
                   <BarChart3 className="h-4 w-4" />
