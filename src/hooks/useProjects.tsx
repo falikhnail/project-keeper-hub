@@ -30,6 +30,15 @@ export interface ProjectComment {
   mentions: string[];
 }
 
+export interface ProjectSubtask {
+  id: string;
+  title: string;
+  completed: boolean;
+  order_position: number;
+  created_by: Profile | null;
+  created_at: Date;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -42,6 +51,7 @@ export interface Project {
   all_handlers: Profile[];
   activities: ProjectActivity[];
   comments: ProjectComment[];
+  subtasks: ProjectSubtask[];
   created_at: Date;
   updated_at: Date;
 }
@@ -98,6 +108,13 @@ export const useProjects = () => {
             .eq('project_id', project.id)
             .order('created_at', { ascending: false });
 
+          // Fetch subtasks
+          const { data: subtasksData } = await supabase
+            .from('project_subtasks')
+            .select('*, profiles(*)')
+            .eq('project_id', project.id)
+            .order('order_position', { ascending: true });
+
           const handlers = handlersData?.map((h) => h.profiles as unknown as Profile) || [];
           const activities: ProjectActivity[] = (activitiesData || []).map((a) => ({
             id: a.id,
@@ -117,6 +134,14 @@ export const useProjects = () => {
             parentCommentId: (c as any).parent_comment_id || null,
             mentions: (c as any).mentions || [],
           }));
+          const subtasks: ProjectSubtask[] = (subtasksData || []).map((s: any) => ({
+            id: s.id,
+            title: s.title,
+            completed: s.completed,
+            order_position: s.order_position,
+            created_by: s.profiles as unknown as Profile,
+            created_at: new Date(s.created_at),
+          }));
 
           return {
             id: project.id,
@@ -130,6 +155,7 @@ export const useProjects = () => {
             all_handlers: handlers,
             activities,
             comments,
+            subtasks,
             created_at: new Date(project.created_at),
             updated_at: new Date(project.updated_at),
           };
@@ -151,7 +177,7 @@ export const useProjects = () => {
   useEffect(() => {
     fetchProjects();
 
-    // Subscribe to realtime changes for projects and comments
+    // Subscribe to realtime changes for projects, comments, and subtasks
     const channel = supabase
       .channel('projects-changes')
       .on(
@@ -162,6 +188,11 @@ export const useProjects = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'project_comments' },
+        () => fetchProjects()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'project_subtasks' },
         () => fetchProjects()
       )
       .subscribe();
@@ -554,6 +585,105 @@ export const useProjects = () => {
     }
   };
 
+  // Subtask functions
+  const addSubtask = async (projectId: string, title: string) => {
+    if (!profile) return;
+
+    try {
+      const project = projects.find((p) => p.id === projectId);
+      const maxOrder = Math.max(0, ...(project?.subtasks?.map((s) => s.order_position) || [0]));
+
+      const { error } = await supabase.from('project_subtasks').insert({
+        project_id: projectId,
+        title,
+        created_by: profile.id,
+        order_position: maxOrder + 1,
+      } as any);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Subtask Added',
+        description: 'New subtask has been added.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error adding subtask',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const toggleSubtask = async (subtaskId: string, completed: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('project_subtasks')
+        .update({ completed } as any)
+        .eq('id', subtaskId);
+
+      if (error) throw error;
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error updating subtask',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteSubtask = async (subtaskId: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_subtasks')
+        .delete()
+        .eq('id', subtaskId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Subtask Deleted',
+        description: 'Subtask has been removed.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting subtask',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const updateSubtask = async (subtaskId: string, title: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_subtasks')
+        .update({ title } as any)
+        .eq('id', subtaskId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Subtask Updated',
+        description: 'Subtask has been updated.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error updating subtask',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     projects,
     loading,
@@ -567,6 +697,10 @@ export const useProjects = () => {
     addComment,
     deleteComment,
     updateComment,
+    addSubtask,
+    toggleSubtask,
+    deleteSubtask,
+    updateSubtask,
     refetch: fetchProjects,
   };
 };
