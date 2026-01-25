@@ -10,7 +10,8 @@ import {
   FolderGit2,
   Loader2,
   MessageSquare,
-  ListTodo
+  ListTodo,
+  Target
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +22,7 @@ import { HandlersList } from '@/components/HandlersList';
 import { AddHandlerDialog } from '@/components/AddHandlerDialog';
 import { CommentsSection } from '@/components/CommentsSection';
 import { SubtasksList } from '@/components/SubtasksList';
+import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -35,7 +37,7 @@ const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, updateProject } = useProjects();
 
   if (loading) {
     return (
@@ -84,6 +86,7 @@ const ProjectDetail = () => {
                 <div className="flex-1">
                   <div className="mb-3 flex flex-wrap items-center gap-2">
                     <Badge variant="outline" className={status.className}>{status.label}</Badge>
+                    <DueDateBadge dueDate={project.due_date} reminderDays={project.reminder_days} />
                     {project.tags?.map((tag) => (
                       <span key={tag} className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">{tag}</span>
                     ))}
@@ -105,7 +108,7 @@ const ProjectDetail = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-center gap-3">
                 <div className="rounded-lg bg-primary/10 p-2"><Calendar className="h-4 w-4 text-primary" /></div>
@@ -121,6 +124,17 @@ const ProjectDetail = () => {
                 <div>
                   <p className="text-xs text-muted-foreground">Last Updated</p>
                   <p className="text-sm font-medium text-foreground">{format(project.updated_at, 'dd MMM yyyy', { locale: id })}</p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-primary/10 p-2"><Target className="h-4 w-4 text-primary" /></div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Due Date</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {project.due_date ? format(project.due_date, 'dd MMM yyyy', { locale: id }) : 'Not set'}
+                  </p>
                 </div>
               </div>
             </div>
