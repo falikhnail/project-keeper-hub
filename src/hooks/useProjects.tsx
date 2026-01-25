@@ -46,6 +46,8 @@ export interface Project {
   link: string | null;
   status: 'active' | 'completed' | 'on-hold' | 'archived';
   tags: string[] | null;
+  due_date: Date | null;
+  reminder_days: number;
   created_by: Profile | null;
   last_handler: Profile | null;
   all_handlers: Profile[];
@@ -62,6 +64,8 @@ export interface ProjectInput {
   link: string;
   status: 'active' | 'completed' | 'on-hold' | 'archived';
   tags: string[];
+  due_date?: Date | null;
+  reminder_days?: number;
 }
 
 export const useProjects = () => {
@@ -150,6 +154,8 @@ export const useProjects = () => {
             link: project.link,
             status: project.status as Project['status'],
             tags: project.tags,
+            due_date: project.due_date ? new Date(project.due_date) : null,
+            reminder_days: project.reminder_days ?? 3,
             created_by: project.created_by_profile as unknown as Profile,
             last_handler: project.last_handler_profile as unknown as Profile,
             all_handlers: handlers,
@@ -215,9 +221,11 @@ export const useProjects = () => {
           link: input.link,
           status: input.status,
           tags: input.tags,
+          due_date: input.due_date?.toISOString() || null,
+          reminder_days: input.reminder_days ?? 3,
           created_by: profile.id,
           last_handler_id: profile.id,
-        })
+        } as any)
         .select()
         .single();
 
@@ -266,8 +274,10 @@ export const useProjects = () => {
           link: input.link,
           status: input.status,
           tags: input.tags,
+          due_date: input.due_date?.toISOString() || null,
+          reminder_days: input.reminder_days ?? 3,
           last_handler_id: profile.id,
-        })
+        } as any)
         .eq('id', id);
 
       if (error) throw error;

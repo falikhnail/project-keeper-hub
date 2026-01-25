@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import { DueDateBadge } from '@/components/DueDatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -54,10 +55,11 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
         {/* Header */}
         <div className="mb-4 flex items-start justify-between">
           <div className="flex-1">
-            <div className="mb-2 flex items-center gap-2">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className={status.className}>
                 {status.label}
               </Badge>
+              <DueDateBadge dueDate={project.due_date} reminderDays={project.reminder_days} />
             </div>
             <h3 
               onClick={() => navigate(`/project/${project.id}`)}

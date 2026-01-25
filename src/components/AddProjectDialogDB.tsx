@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { DueDatePicker } from '@/components/DueDatePicker';
 
 interface AddProjectDialogDBProps {
   open: boolean;
@@ -39,6 +40,8 @@ export const AddProjectDialogDB = ({
   const [status, setStatus] = useState<'active' | 'completed' | 'on-hold' | 'archived'>('active');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [reminderDays, setReminderDays] = useState(3);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -48,6 +51,8 @@ export const AddProjectDialogDB = ({
       setLink(editingProject.link || '');
       setStatus(editingProject.status);
       setTags(editingProject.tags || []);
+      setDueDate(editingProject.due_date);
+      setReminderDays(editingProject.reminder_days);
     } else {
       resetForm();
     }
@@ -60,6 +65,8 @@ export const AddProjectDialogDB = ({
     setStatus('active');
     setTagInput('');
     setTags([]);
+    setDueDate(null);
+    setReminderDays(3);
   };
 
   const handleAddTag = () => {
@@ -85,6 +92,8 @@ export const AddProjectDialogDB = ({
         link: link.trim(),
         status,
         tags,
+        due_date: dueDate,
+        reminder_days: reminderDays,
       });
       resetForm();
     } finally {
@@ -204,6 +213,16 @@ export const AddProjectDialogDB = ({
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Due Date</Label>
+            <DueDatePicker
+              dueDate={dueDate}
+              reminderDays={reminderDays}
+              onDueDateChange={setDueDate}
+              onReminderDaysChange={setReminderDays}
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

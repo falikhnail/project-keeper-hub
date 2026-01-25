@@ -236,10 +236,12 @@ export type Database = {
           created_at: string
           created_by: string
           description: string | null
+          due_date: string | null
           id: string
           last_handler_id: string | null
           link: string | null
           name: string
+          reminder_days: number | null
           status: Database["public"]["Enums"]["project_status"]
           tags: string[] | null
           updated_at: string
@@ -248,10 +250,12 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string | null
+          due_date?: string | null
           id?: string
           last_handler_id?: string | null
           link?: string | null
           name: string
+          reminder_days?: number | null
           status?: Database["public"]["Enums"]["project_status"]
           tags?: string[] | null
           updated_at?: string
@@ -260,10 +264,12 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string | null
+          due_date?: string | null
           id?: string
           last_handler_id?: string | null
           link?: string | null
           name?: string
+          reminder_days?: number | null
           status?: Database["public"]["Enums"]["project_status"]
           tags?: string[] | null
           updated_at?: string
