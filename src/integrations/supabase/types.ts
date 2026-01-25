@@ -183,6 +183,54 @@ export type Database = {
           },
         ]
       }
+      project_subtasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          created_by: string
+          id: string
+          order_position: number
+          project_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          created_by: string
+          id?: string
+          order_position?: number
+          project_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          order_position?: number
+          project_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_subtasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_subtasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string

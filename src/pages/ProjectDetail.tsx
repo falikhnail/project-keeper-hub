@@ -9,7 +9,8 @@ import {
   Activity,
   FolderGit2,
   Loader2,
-  MessageSquare
+  MessageSquare,
+  ListTodo
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,6 +20,7 @@ import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { HandlersList } from '@/components/HandlersList';
 import { AddHandlerDialog } from '@/components/AddHandlerDialog';
 import { CommentsSection } from '@/components/CommentsSection';
+import { SubtasksList } from '@/components/SubtasksList';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -33,7 +35,7 @@ const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask } = useProjects();
 
   if (loading) {
     return (
@@ -143,7 +145,35 @@ const ProjectDetail = () => {
           </motion.div>
 
           <div className="grid gap-8 lg:grid-cols-3">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-2">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-8 lg:col-span-2">
+              {/* Subtasks */}
+              <div className="rounded-xl border border-border bg-card p-6">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2"><ListTodo className="h-5 w-5 text-primary" /></div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Subtasks</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {(project.subtasks || []).filter(s => s.completed).length}/{(project.subtasks || []).length} completed
+                    </p>
+                  </div>
+                </div>
+                <SubtasksList
+                  subtasks={(project.subtasks || []).map(s => ({
+                    ...s,
+                    created_by: s.created_by ? {
+                      id: s.created_by.id,
+                      display_name: s.created_by.display_name,
+                      email: s.created_by.email,
+                    } : null,
+                  }))}
+                  onAddSubtask={(title) => addSubtask(project.id, title)}
+                  onToggleSubtask={toggleSubtask}
+                  onDeleteSubtask={deleteSubtask}
+                  onUpdateSubtask={updateSubtask}
+                />
+              </div>
+
+              {/* Activity Timeline */}
               <div className="rounded-xl border border-border bg-card p-6">
                 <div className="mb-6 flex items-center gap-3">
                   <div className="rounded-lg bg-primary/10 p-2"><Activity className="h-5 w-5 text-primary" /></div>
