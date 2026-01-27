@@ -39,6 +39,16 @@ export interface ProjectSubtask {
   created_at: Date;
 }
 
+export interface ProjectAttachment {
+  id: string;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  file_type: string | null;
+  created_at: Date;
+  uploaded_by: Profile | null;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -54,6 +64,7 @@ export interface Project {
   activities: ProjectActivity[];
   comments: ProjectComment[];
   subtasks: ProjectSubtask[];
+  attachments: ProjectAttachment[];
   created_at: Date;
   updated_at: Date;
 }
@@ -119,6 +130,13 @@ export const useProjects = () => {
             .eq('project_id', project.id)
             .order('order_position', { ascending: true });
 
+          // Fetch attachments
+          const { data: attachmentsData } = await supabase
+            .from('project_attachments')
+            .select('*, profiles(*)')
+            .eq('project_id', project.id)
+            .order('created_at', { ascending: false });
+
           const handlers = handlersData?.map((h) => h.profiles as unknown as Profile) || [];
           const activities: ProjectActivity[] = (activitiesData || []).map((a) => ({
             id: a.id,
@@ -146,6 +164,15 @@ export const useProjects = () => {
             created_by: s.profiles as unknown as Profile,
             created_at: new Date(s.created_at),
           }));
+          const attachments: ProjectAttachment[] = (attachmentsData || []).map((a: any) => ({
+            id: a.id,
+            file_name: a.file_name,
+            file_path: a.file_path,
+            file_size: a.file_size,
+            file_type: a.file_type,
+            created_at: new Date(a.created_at),
+            uploaded_by: a.profiles as unknown as Profile,
+          }));
 
           return {
             id: project.id,
@@ -162,6 +189,7 @@ export const useProjects = () => {
             activities,
             comments,
             subtasks,
+            attachments,
             created_at: new Date(project.created_at),
             updated_at: new Date(project.updated_at),
           };
@@ -694,6 +722,83 @@ export const useProjects = () => {
     }
   };
 
+  // Attachment functions
+  const uploadAttachment = async (projectId: string, file: File) => {
+    if (!profile) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${projectId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('project-attachments')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { error: dbError } = await supabase.from('project_attachments').insert({
+        project_id: projectId,
+        uploaded_by: profile.id,
+        file_name: file.name,
+        file_path: fileName,
+        file_size: file.size,
+        file_type: file.type || null,
+      } as any);
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: 'File Uploaded',
+        description: `${file.name} has been uploaded.`,
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error uploading file',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteAttachment = async (attachmentId: string, filePath: string) => {
+    try {
+      const { error: storageError } = await supabase.storage
+        .from('project-attachments')
+        .remove([filePath]);
+
+      if (storageError) throw storageError;
+
+      const { error: dbError } = await supabase
+        .from('project_attachments')
+        .delete()
+        .eq('id', attachmentId);
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: 'File Deleted',
+        description: 'File has been removed.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting file',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const getAttachmentPublicUrl = (filePath: string): string => {
+    const { data } = supabase.storage
+      .from('project-attachments')
+      .getPublicUrl(filePath);
+    return data.publicUrl;
+  };
+
   return {
     projects,
     loading,
@@ -711,6 +816,9 @@ export const useProjects = () => {
     toggleSubtask,
     deleteSubtask,
     updateSubtask,
+    uploadAttachment,
+    deleteAttachment,
+    getAttachmentPublicUrl,
     refetch: fetchProjects,
   };
 };

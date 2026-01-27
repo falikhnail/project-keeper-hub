@@ -11,7 +11,8 @@ import {
   Loader2,
   MessageSquare,
   ListTodo,
-  Target
+  Target,
+  Paperclip
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,6 +23,7 @@ import { HandlersList } from '@/components/HandlersList';
 import { AddHandlerDialog } from '@/components/AddHandlerDialog';
 import { CommentsSection } from '@/components/CommentsSection';
 import { SubtasksList } from '@/components/SubtasksList';
+import { FileAttachments } from '@/components/FileAttachments';
 import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -37,7 +39,7 @@ const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, updateProject } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject } = useProjects();
 
   if (loading) {
     return (
@@ -184,6 +186,31 @@ const ProjectDetail = () => {
                   onToggleSubtask={toggleSubtask}
                   onDeleteSubtask={deleteSubtask}
                   onUpdateSubtask={updateSubtask}
+                />
+              </div>
+
+              {/* File Attachments */}
+              <div className="rounded-xl border border-border bg-card p-6">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2"><Paperclip className="h-5 w-5 text-primary" /></div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Attachments</h2>
+                    <p className="text-sm text-muted-foreground">{(project.attachments || []).length} files</p>
+                  </div>
+                </div>
+                <FileAttachments
+                  attachments={(project.attachments || []).map(a => ({
+                    ...a,
+                    uploaded_by: a.uploaded_by ? {
+                      id: a.uploaded_by.id,
+                      display_name: a.uploaded_by.display_name,
+                      email: a.uploaded_by.email,
+                    } : null,
+                  }))}
+                  onUpload={(file) => uploadAttachment(project.id, file)}
+                  onDelete={deleteAttachment}
+                  getPublicUrl={getAttachmentPublicUrl}
+                  currentUserProfileId={profile?.id}
                 />
               </div>
 
