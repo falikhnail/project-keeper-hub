@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Plus, Loader2 } from 'lucide-react';
+ import { useState, useEffect } from 'react';
+ import { X, Plus, Loader2, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { Project, ProjectInput } from '@/hooks/useProjects';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,11 +20,14 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { DueDatePicker } from '@/components/DueDatePicker';
+ import { TemplateSelector } from '@/components/TemplateSelector';
+ import { ProjectTemplate } from '@/hooks/useProjectTemplates';
+ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface AddProjectDialogDBProps {
   open: boolean;
   onClose: () => void;
-  onSave: (project: ProjectInput) => Promise<void>;
+   onSave: (project: ProjectInput, initialSubtasks?: string[]) => Promise<void>;
   editingProject?: Project | null;
 }
 
@@ -43,6 +46,9 @@ export const AddProjectDialogDB = ({
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [reminderDays, setReminderDays] = useState(3);
   const [saving, setSaving] = useState(false);
+   const [templateOpen, setTemplateOpen] = useState(false);
+   const [selectedTemplate, setSelectedTemplate] = useState<ProjectTemplate | null>(null);
+   const [initialSubtasks, setInitialSubtasks] = useState<string[]>([]);
 
   useEffect(() => {
     if (editingProject) {
@@ -67,7 +73,18 @@ export const AddProjectDialogDB = ({
     setTags([]);
     setDueDate(null);
     setReminderDays(3);
+     setSelectedTemplate(null);
+     setInitialSubtasks([]);
+     setTemplateOpen(false);
   };
+ 
+   const handleTemplateSelect = (template: ProjectTemplate) => {
+     setSelectedTemplate(template);
+     setTags(template.default_tags);
+     setReminderDays(template.default_reminder_days);
+     setInitialSubtasks(template.subtask_titles);
+     setTemplateOpen(false);
+   };
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -94,7 +111,7 @@ export const AddProjectDialogDB = ({
         tags,
         due_date: dueDate,
         reminder_days: reminderDays,
-      });
+       }, initialSubtasks);
       resetForm();
     } finally {
       setSaving(false);
@@ -123,6 +140,36 @@ export const AddProjectDialogDB = ({
             />
           </div>
 
+         {/* Template Selector - only show for new projects */}
+         {!editingProject && (
+           <Collapsible open={templateOpen} onOpenChange={setTemplateOpen}>
+             <CollapsibleTrigger asChild>
+               <Button
+                 type="button"
+                 variant="outline"
+                 className="w-full justify-between"
+                 disabled={saving}
+               >
+                 <span className="flex items-center gap-2">
+                   <FileText className="h-4 w-4" />
+                   {selectedTemplate ? selectedTemplate.name : 'Use Template (Optional)'}
+                 </span>
+                 {templateOpen ? (
+                   <ChevronUp className="h-4 w-4" />
+                 ) : (
+                   <ChevronDown className="h-4 w-4" />
+                 )}
+               </Button>
+             </CollapsibleTrigger>
+             <CollapsibleContent className="pt-2">
+               <TemplateSelector
+                 onSelect={handleTemplateSelect}
+                 selectedId={selectedTemplate?.id}
+               />
+             </CollapsibleContent>
+           </Collapsible>
+         )}
+ 
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea

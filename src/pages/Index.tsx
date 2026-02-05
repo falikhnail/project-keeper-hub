@@ -26,7 +26,7 @@ type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 const Index = () => {
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
-  const { projects, loading, addProject, updateProject, updateProjectStatus, deleteProject } = useProjects();
+ const { projects, loading, addProject, updateProject, updateProjectStatus, deleteProject, addSubtask } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,11 +75,17 @@ const Index = () => {
     setStatusFilters([]);
   };
 
-  const handleAddProject = async (input: ProjectInput) => {
+   const handleAddProject = async (input: ProjectInput, initialSubtasks?: string[]) => {
     if (editingProject) {
       await updateProject(editingProject.id, input);
     } else {
-      await addProject(input);
+       const projectId = await addProject(input);
+       // Add initial subtasks from template if provided
+       if (projectId && initialSubtasks && initialSubtasks.length > 0) {
+         for (const title of initialSubtasks) {
+           await addSubtask(projectId, title);
+         }
+       }
     }
     setEditingProject(null);
     setDialogOpen(false);
