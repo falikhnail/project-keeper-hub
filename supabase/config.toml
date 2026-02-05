@@ -1,1 +1,4 @@
-project_id = "nrkovtgemwieomxxzdhj"
+ project_id = "nrkovtgemwieomxxzdhj"
+ 
+ [functions.send-deadline-reminder]
+ verify_jwt = false
