@@ -12,7 +12,8 @@ import {
   MessageSquare,
   ListTodo,
   Target,
-  Paperclip
+   Paperclip,
+   Save
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +26,8 @@ import { CommentsSection } from '@/components/CommentsSection';
 import { SubtasksList } from '@/components/SubtasksList';
 import { FileAttachments } from '@/components/FileAttachments';
 import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
+ import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
+ import { useState } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -40,6 +43,7 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject } = useProjects();
+   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
 
   if (loading) {
     return (
@@ -104,6 +108,10 @@ const ProjectDetail = () => {
                     </a>
                   </Button>
                 )}
+                 <Button variant="outline" onClick={() => setSaveTemplateOpen(true)} className="gap-2">
+                   <Save className="h-4 w-4" />
+                   Save as Template
+                 </Button>
               </div>
             </motion.div>
           </div>
@@ -275,6 +283,13 @@ const ProjectDetail = () => {
           </div>
         </main>
       </div>
+
+       {/* Save as Template Dialog */}
+       <SaveAsTemplateDialog
+         open={saveTemplateOpen}
+         onClose={() => setSaveTemplateOpen(false)}
+         project={project}
+       />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import {
   PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
 } from 'recharts';
 import { ArrowLeft, TrendingUp, Users, FolderKanban, MessageSquare, Activity } from 'lucide-react';
+ import { CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProjects } from '@/hooks/useProjects';
@@ -115,6 +116,71 @@ const Analytics = () => {
       .slice(0, 6);
   }, [projects]);
 
+   // Deadline overview (next 14 days)
+   const deadlineData = useMemo(() => {
+     const now = new Date();
+     now.setHours(0, 0, 0, 0);
+ 
+     const categories = {
+       overdue: 0,
+       today: 0,
+       thisWeek: 0,
+       nextWeek: 0,
+       later: 0,
+       noDueDate: 0,
+     };
+ 
+     projects.forEach((p) => {
+       if (!p.due_date) {
+         categories.noDueDate++;
+         return;
+       }
+ 
+       const dueDate = new Date(p.due_date);
+       dueDate.setHours(0, 0, 0, 0);
+       const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+ 
+       if (diffDays < 0) {
+         categories.overdue++;
+       } else if (diffDays === 0) {
+         categories.today++;
+       } else if (diffDays <= 7) {
+         categories.thisWeek++;
+       } else if (diffDays <= 14) {
+         categories.nextWeek++;
+       } else {
+         categories.later++;
+       }
+     });
+ 
+     return [
+       { name: 'Overdue', value: categories.overdue, fill: 'hsl(var(--destructive))' },
+       { name: 'Hari Ini', value: categories.today, fill: 'hsl(var(--chart-3))' },
+       { name: 'Minggu Ini', value: categories.thisWeek, fill: 'hsl(var(--chart-2))' },
+       { name: 'Minggu Depan', value: categories.nextWeek, fill: 'hsl(var(--primary))' },
+       { name: 'Nanti', value: categories.later, fill: 'hsl(var(--muted-foreground))' },
+     ].filter((d) => d.value > 0);
+   }, [projects]);
+ 
+   // Upcoming deadlines list
+   const upcomingDeadlines = useMemo(() => {
+     const now = new Date();
+     now.setHours(0, 0, 0, 0);
+ 
+     return projects
+       .filter((p) => p.due_date && p.status !== 'completed' && p.status !== 'archived')
+       .map((p) => {
+         const dueDate = new Date(p.due_date!);
+         const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+         return {
+           ...p,
+           daysUntilDue: diffDays,
+         };
+       })
+       .sort((a, b) => a.daysUntilDue - b.daysUntilDue)
+       .slice(0, 5);
+   }, [projects]);
+ 
   // Summary stats
   const stats = useMemo(() => {
     const totalActivities = projects.reduce((sum, p) => sum + (p.activities?.length || 0), 0);
@@ -398,6 +464,90 @@ const Analytics = () => {
               </CardContent>
             </Card>
           </motion.div>
+
+         {/* Deadline Overview */}
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.5 }}
+         >
+           <Card>
+             <CardHeader>
+               <CardTitle className="flex items-center gap-2">
+                 <CalendarClock className="h-5 w-5 text-primary" />
+                 Deadline Overview
+               </CardTitle>
+               <CardDescription>Distribusi deadline proyek</CardDescription>
+             </CardHeader>
+             <CardContent>
+               {deadlineData.length > 0 ? (
+                 <div className="space-y-4">
+                   <ResponsiveContainer width="100%" height={180}>
+                     <BarChart data={deadlineData} layout="vertical">
+                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                       <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                       <YAxis
+                         dataKey="name"
+                         type="category"
+                         width={90}
+                         stroke="hsl(var(--muted-foreground))"
+                         fontSize={12}
+                       />
+                       <Tooltip
+                         contentStyle={{
+                           backgroundColor: 'hsl(var(--card))',
+                           border: '1px solid hsl(var(--border))',
+                           borderRadius: '8px',
+                         }}
+                       />
+                       <Bar dataKey="value" name="Proyek" radius={[0, 4, 4, 0]}>
+                         {deadlineData.map((entry, index) => (
+                           <Cell key={`cell-${index}`} fill={entry.fill} />
+                         ))}
+                       </Bar>
+                     </BarChart>
+                   </ResponsiveContainer>
+                   
+                   {/* Upcoming deadlines list */}
+                   {upcomingDeadlines.length > 0 && (
+                     <div className="space-y-2 pt-2 border-t border-border">
+                       <p className="text-xs font-medium text-muted-foreground uppercase">Deadline Terdekat</p>
+                       {upcomingDeadlines.map((p) => (
+                         <div
+                           key={p.id}
+                           className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
+                         >
+                           <span className="text-sm font-medium truncate max-w-[180px]">{p.name}</span>
+                           <span
+                             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                               p.daysUntilDue < 0
+                                 ? 'bg-destructive/20 text-destructive'
+                                 : p.daysUntilDue === 0
+                                 ? 'bg-chart-3/20 text-chart-3'
+                                 : p.daysUntilDue <= 3
+                                 ? 'bg-chart-2/20 text-chart-2'
+                                 : 'bg-primary/20 text-primary'
+                             }`}
+                           >
+                             {p.daysUntilDue < 0
+                               ? `${Math.abs(p.daysUntilDue)}d overdue`
+                               : p.daysUntilDue === 0
+                               ? 'Hari ini'
+                               : `${p.daysUntilDue}d left`}
+                           </span>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                 </div>
+               ) : (
+                 <div className="flex h-[250px] items-center justify-center text-muted-foreground">
+                   Belum ada proyek dengan deadline
+                 </div>
+               )}
+             </CardContent>
+           </Card>
+         </motion.div>
         </div>
       </div>
     </div>

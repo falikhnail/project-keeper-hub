@@ -236,8 +236,8 @@ export const useProjects = () => {
     };
   }, [fetchProjects]);
 
-  const addProject = async (input: ProjectInput) => {
-    if (!profile) return;
+   const addProject = async (input: ProjectInput): Promise<string | null> => {
+     if (!profile) return null;
 
     try {
       // Create project
@@ -279,12 +279,14 @@ export const useProjects = () => {
       });
 
       fetchProjects();
+       return newProject.id;
     } catch (error: any) {
       toast({
         title: 'Error adding project',
         description: error.message,
         variant: 'destructive',
       });
+       return null;
     }
   };
 
