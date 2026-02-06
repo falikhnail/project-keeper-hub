@@ -5,6 +5,7 @@ import { Project } from '@/hooks/useProjects';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +16,16 @@ import {
 import { DueDateBadge } from '@/components/DueDatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface ProjectCardProps {
   project: Project;
   index: number;
   onEdit: (project: Project) => void;
   onDelete: (id: string) => void;
+  isSelected?: boolean;
+  onSelectionChange?: (id: string, selected: boolean) => void;
+  selectionMode?: boolean;
 }
 
 const statusConfig = {
@@ -30,7 +35,15 @@ const statusConfig = {
   archived: { label: 'Archived', className: 'bg-muted text-muted-foreground border-border' },
 };
 
-export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardProps) => {
+export const ProjectCard = ({ 
+  project, 
+  index, 
+  onEdit, 
+  onDelete,
+  isSelected = false,
+  onSelectionChange,
+  selectionMode = false,
+}: ProjectCardProps) => {
   const navigate = useNavigate();
   const status = statusConfig[project.status];
   const handler = project.last_handler;
@@ -39,6 +52,10 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
     .map((n) => n[0])
     .join('')
     .toUpperCase() || handler?.email?.[0].toUpperCase() || '?';
+
+  const handleCheckboxChange = (checked: boolean) => {
+    onSelectionChange?.(project.id, checked);
+  };
 
   return (
     <motion.div
@@ -49,11 +66,33 @@ export const ProjectCard = ({ project, index, onEdit, onDelete }: ProjectCardPro
       className="group relative"
     >
       {/* Glow effect */}
-      <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-primary/20 to-primary/5 opacity-0 blur transition-opacity duration-300 group-hover:opacity-100" />
+      <div className={cn(
+        "absolute -inset-0.5 rounded-xl bg-gradient-to-r from-primary/20 to-primary/5 blur transition-opacity duration-300",
+        isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+      )} />
 
-      <div className="relative flex h-full flex-col rounded-xl border border-border bg-card p-5 shadow-card transition-all duration-300 group-hover:border-primary/30 group-hover:shadow-card-hover">
+      <div className={cn(
+        "relative flex h-full flex-col rounded-xl border bg-card p-5 shadow-card transition-all duration-300",
+        isSelected 
+          ? "border-primary ring-2 ring-primary/20" 
+          : "border-border group-hover:border-primary/30 group-hover:shadow-card-hover"
+      )}>
+        {/* Selection checkbox - visible on hover or in selection mode */}
+        {onSelectionChange && (
+          <div className={cn(
+            "absolute left-3 top-3 z-10 transition-opacity",
+            selectionMode || isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          )}>
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={handleCheckboxChange}
+              className="h-5 w-5 border-2 bg-background"
+            />
+          </div>
+        )}
+
         {/* Header */}
-        <div className="mb-4 flex items-start justify-between">
+        <div className={cn("mb-4 flex items-start justify-between", onSelectionChange && "pl-8")}>
           <div className="flex-1">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className={status.className}>

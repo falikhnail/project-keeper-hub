@@ -11,6 +11,7 @@ import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { CalendarView } from '@/components/CalendarView';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
+import { BulkActionsBar } from '@/components/BulkActionsBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -27,12 +28,13 @@ type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 const Index = () => {
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
- const { projects, loading, addProject, updateProject, updateProjectStatus, deleteProject, addSubtask } = useProjects();
+ const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(new Set());
 
   // Stats
   const stats = useMemo(() => {
@@ -108,6 +110,33 @@ const Index = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingProject(null);
+  };
+
+  // Bulk selection handlers
+  const handleSelectionChange = (projectId: string, selected: boolean) => {
+    setSelectedProjectIds((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(projectId);
+      } else {
+        newSet.delete(projectId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleClearSelection = () => {
+    setSelectedProjectIds(new Set());
+  };
+
+  const handleBulkStatusChange = async (status: ProjectStatus) => {
+    await bulkUpdateStatus(Array.from(selectedProjectIds), status);
+    setSelectedProjectIds(new Set());
+  };
+
+  const handleBulkDelete = async () => {
+    await bulkDeleteProjects(Array.from(selectedProjectIds));
+    setSelectedProjectIds(new Set());
   };
 
   const userInitials = profile?.display_name
@@ -263,6 +292,9 @@ const Index = () => {
                     index={index}
                     onEdit={handleEditProject}
                     onDelete={handleDeleteProject}
+                    isSelected={selectedProjectIds.has(project.id)}
+                    onSelectionChange={handleSelectionChange}
+                    selectionMode={selectedProjectIds.size > 0}
                   />
                 ))}
               </div>
@@ -309,6 +341,14 @@ const Index = () => {
         onClose={handleCloseDialog}
         onSave={handleAddProject}
         editingProject={editingProject}
+      />
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedProjectIds.size}
+        onClearSelection={handleClearSelection}
+        onBulkStatusChange={handleBulkStatusChange}
+        onBulkDelete={handleBulkDelete}
       />
     </div>
   );
