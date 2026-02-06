@@ -401,6 +401,74 @@ export const useProjects = () => {
     }
   };
 
+  const bulkUpdateStatus = async (projectIds: string[], newStatus: Project['status']) => {
+    if (!profile || projectIds.length === 0) return;
+
+    try {
+      // Update all projects
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          status: newStatus,
+          last_handler_id: profile.id,
+        })
+        .in('id', projectIds);
+
+      if (error) throw error;
+
+      // Add activities for each project
+      const activities = projectIds.map((projectId) => ({
+        project_id: projectId,
+        type: 'status_changed' as const,
+        description: `Status changed to ${newStatus} (bulk update)`,
+        handler_id: profile.id,
+        new_value: newStatus,
+      }));
+
+      await supabase.from('project_activities').insert(activities);
+
+      toast({
+        title: 'Status Updated',
+        description: `${projectIds.length} project${projectIds.length > 1 ? 's' : ''} updated to ${newStatus}.`,
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error updating status',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const bulkDeleteProjects = async (projectIds: string[]) => {
+    if (projectIds.length === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .in('id', projectIds);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Projects Deleted',
+        description: `${projectIds.length} project${projectIds.length > 1 ? 's' : ''} have been removed.`,
+        variant: 'destructive',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting projects',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const deleteProject = async (id: string) => {
     try {
       const project = projects.find((p) => p.id === id);
@@ -834,6 +902,8 @@ export const useProjects = () => {
     addProject,
     updateProject,
     updateProjectStatus,
+    bulkUpdateStatus,
+    bulkDeleteProjects,
     deleteProject,
     addHandler,
     removeHandler,
