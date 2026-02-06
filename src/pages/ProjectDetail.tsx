@@ -23,7 +23,7 @@ import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { HandlersList } from '@/components/HandlersList';
 import { AddHandlerDialog } from '@/components/AddHandlerDialog';
 import { CommentsSection } from '@/components/CommentsSection';
-import { SubtasksList } from '@/components/SubtasksList';
+import { DraggableSubtasksList } from '@/components/DraggableSubtasksList';
 import { FileAttachments } from '@/components/FileAttachments';
 import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
  import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
@@ -42,7 +42,7 @@ const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, reorderSubtasks, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject } = useProjects();
    const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
 
   if (loading) {
@@ -181,7 +181,7 @@ const ProjectDetail = () => {
                     </p>
                   </div>
                 </div>
-                <SubtasksList
+                <DraggableSubtasksList
                   subtasks={(project.subtasks || []).map(s => ({
                     ...s,
                     created_by: s.created_by ? {
@@ -194,6 +194,7 @@ const ProjectDetail = () => {
                   onToggleSubtask={toggleSubtask}
                   onDeleteSubtask={deleteSubtask}
                   onUpdateSubtask={updateSubtask}
+                  onReorderSubtasks={(ids) => reorderSubtasks(project.id, ids)}
                 />
               </div>
 

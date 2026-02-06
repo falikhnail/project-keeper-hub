@@ -724,6 +724,33 @@ export const useProjects = () => {
     }
   };
 
+  const reorderSubtasks = async (projectId: string, subtaskIds: string[]) => {
+    try {
+      // Update order_position for each subtask
+      const updates = subtaskIds.map((id, index) =>
+        supabase
+          .from('project_subtasks')
+          .update({ order_position: index } as any)
+          .eq('id', id)
+      );
+
+      await Promise.all(updates);
+
+      toast({
+        title: 'Order Updated',
+        description: 'Subtasks have been reordered.',
+      });
+
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: 'Error reordering subtasks',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Attachment functions
   const uploadAttachment = async (projectId: string, file: File) => {
     if (!profile) return;
@@ -818,6 +845,7 @@ export const useProjects = () => {
     toggleSubtask,
     deleteSubtask,
     updateSubtask,
+    reorderSubtasks,
     uploadAttachment,
     deleteAttachment,
     getAttachmentPublicUrl,
