@@ -9,6 +9,7 @@ import { AddProjectDialogDB } from '@/components/AddProjectDialogDB';
 import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
+import { CalendarView } from '@/components/CalendarView';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -286,12 +287,17 @@ const Index = () => {
                 </Button>
               </motion.div>
             )
-          ) : (
+          ) : viewMode === 'kanban' ? (
             <KanbanBoard
               projects={filteredProjects}
               onStatusChange={handleStatusChange}
               onEdit={handleEditProject}
               onDelete={handleDeleteProject}
+            />
+          ) : (
+            <CalendarView
+              projects={filteredProjects}
+              onEdit={handleEditProject}
             />
           )}
         </main>
