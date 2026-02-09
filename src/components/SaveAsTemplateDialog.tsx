@@ -1,4 +1,4 @@
- import { useState } from 'react';
+ import { useState, useEffect } from 'react';
  import { Save, Loader2, X, Plus } from 'lucide-react';
  import { Button } from '@/components/ui/button';
  import { Input } from '@/components/ui/input';
@@ -44,16 +44,16 @@
    const [subtasks, setSubtasks] = useState<string[]>([]);
    const [subtaskInput, setSubtaskInput] = useState('');
  
-   // Initialize from project when opened
-   useState(() => {
-     if (project && open) {
-       setName(`${project.name} Template`);
-       setDescription(project.description || '');
-       setTags(project.tags || []);
-       setReminderDays(project.reminder_days);
-       setSubtasks(project.subtasks?.map((s) => s.title) || []);
-     }
-   });
+    // Initialize from project when opened
+    useEffect(() => {
+      if (project && open) {
+        setName(`${project.name} Template`);
+        setDescription(project.description || '');
+        setTags(project.tags || []);
+        setReminderDays(project.reminder_days);
+        setSubtasks(project.subtasks?.map((s) => s.title) || []);
+      }
+    }, [project, open]);
  
    const handleAddTag = () => {
      if (tagInput.trim() && !tags.includes(tagInput.trim())) {
