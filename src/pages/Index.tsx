@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
 import { ProjectCard } from '@/components/ProjectCard';
@@ -270,15 +271,38 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="mb-6"
+            className="mb-6 flex items-end gap-4"
           >
-            <SearchFilter
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              statusFilters={statusFilters}
-              onStatusFilterChange={handleStatusFilterChange}
-              onClearFilters={handleClearFilters}
-            />
+            <div className="flex-1">
+              <SearchFilter
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                statusFilters={statusFilters}
+                onStatusFilterChange={handleStatusFilterChange}
+                onClearFilters={handleClearFilters}
+              />
+            </div>
+            {viewMode === 'grid' && filteredProjects.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (selectedProjectIds.size === filteredProjects.length) {
+                    setSelectedProjectIds(new Set());
+                  } else {
+                    setSelectedProjectIds(new Set(filteredProjects.map(p => p.id)));
+                  }
+                }}
+                className="shrink-0 gap-2"
+              >
+                <Checkbox
+                  checked={filteredProjects.length > 0 && selectedProjectIds.size === filteredProjects.length}
+                  className="h-4 w-4 pointer-events-none"
+                  tabIndex={-1}
+                />
+                {selectedProjectIds.size === filteredProjects.length ? 'Deselect All' : 'Select All'}
+              </Button>
+            )}
           </motion.div>
 
           {/* Projects View */}
