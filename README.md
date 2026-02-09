@@ -1,73 +1,134 @@
-# Welcome to your Lovable project
+# 📁 Project Management
 
-## Project info
+Aplikasi manajemen proyek berbasis web untuk melacak proyek, deadline, subtasks, dan kolaborasi tim dalam satu platform.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![React](https://img.shields.io/badge/React-18-blue?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-blue?logo=tailwindcss)
+![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ Fitur Utama
 
-**Use Lovable**
+### 📋 Manajemen Proyek
+- **CRUD Proyek** — Buat, edit, dan hapus proyek dengan informasi lengkap (nama, deskripsi, link, tags, deadline)
+- **Status Tracking** — 4 status proyek: `Active`, `Completed`, `On Hold`, `Archived`
+- **Due Date & Reminder** — Atur deadline dengan pengingat otomatis (1, 3, 7, atau 14 hari sebelumnya)
+- **Tags** — Kategorisasi proyek dengan tag custom
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 👁️ Multiple Views
+- **Grid View** — Tampilan kartu responsif dengan animasi
+- **Kanban Board** — Drag-and-drop antar kolom status
+- **Calendar View** — Visualisasi proyek berdasarkan deadline di kalender bulanan
 
-Changes made via Lovable will be committed automatically to this repo.
+### ✅ Subtasks
+- **Checklist Subtasks** — Tambah dan kelola subtask per proyek
+- **Drag-and-Drop Reorder** — Ubah urutan subtask dengan drag-and-drop
+- **Progress Tracking** — Lihat progress penyelesaian subtask
 
-**Use your preferred IDE**
+### 📝 Project Templates
+- **Simpan Template** — Buat template dari proyek yang sudah ada
+- **Terapkan Template** — Gunakan template saat membuat proyek baru (otomatis isi tags, reminder, subtasks)
+- **Kelola Template** — Edit dan hapus template
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 💬 Kolaborasi
+- **Komentar & Thread** — Diskusi dengan reply bersarang (nested comments)
+- **Mentions** — Tag anggota tim di komentar
+- **Handler Assignment** — Tetapkan handler/PIC ke proyek
+- **Activity Timeline** — Riwayat lengkap perubahan proyek
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 📎 File Attachments
+- **Upload File** — Lampirkan file ke proyek
+- **Preview & Download** — Lihat dan unduh lampiran
 
-Follow these steps:
+### 📊 Analytics Dashboard
+- **Statistik Proyek** — Distribusi proyek per status (pie chart)
+- **Trend Bulanan** — Grafik proyek dibuat per bulan
+- **Deadline Overview** — Distribusi deadline (overdue, today, this week, dll.)
+- **Upcoming Deadlines** — Daftar 5 proyek dengan deadline terdekat
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 🔧 Fitur Tambahan
+- **Bulk Actions** — Pilih beberapa proyek sekaligus untuk update status atau hapus massal
+- **Select All** — Pilih semua proyek di grid view
+- **Konfirmasi Delete** — Dialog konfirmasi sebelum penghapusan
+- **Search & Filter** — Cari proyek dan filter berdasarkan status
+- **Dark/Light Mode** — Toggle tema gelap dan terang
+- **Responsive Design** — Tampilan optimal di desktop dan mobile
+- **Authentication** — Login dan registrasi dengan email
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🛠️ Tech Stack
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18, TypeScript |
+| **Styling** | Tailwind CSS, shadcn/ui |
+| **State** | TanStack React Query |
+| **Routing** | React Router DOM v6 |
+| **Animation** | Framer Motion |
+| **Drag & Drop** | @hello-pangea/dnd |
+| **Charts** | Recharts |
+| **Backend** | Lovable Cloud |
+| **Auth** | Email-based authentication |
+| **Storage** | Cloud file storage |
+| **Build** | Vite |
+
+---
+
+## 📂 Struktur Proyek
+
+```
+src/
+├── components/              # Komponen UI
+│   ├── ui/                  # shadcn/ui components
+│   ├── ProjectCard.tsx      # Kartu proyek
+│   ├── KanbanBoard.tsx      # Tampilan Kanban
+│   ├── CalendarView.tsx     # Tampilan Kalender
+│   ├── BulkActionsBar.tsx   # Aksi massal
+│   ├── SearchFilter.tsx     # Pencarian & filter
+│   ├── DraggableSubtasksList.tsx # Drag-drop subtasks
+│   ├── CommentsSection.tsx  # Komentar proyek
+│   ├── FileAttachments.tsx  # Lampiran file
+│   ├── TemplateSelector.tsx # Pemilih template
+│   └── ...
+├── hooks/                   # Custom hooks
+│   ├── useAuth.tsx          # Autentikasi
+│   ├── useProjects.tsx      # CRUD proyek
+│   ├── useProjectTemplates.tsx # Template proyek
+│   └── useTheme.tsx         # Tema dark/light
+├── pages/                   # Halaman
+│   ├── Index.tsx            # Dashboard utama
+│   ├── ProjectDetail.tsx    # Detail proyek
+│   ├── Analytics.tsx        # Dashboard analitik
+│   └── Auth.tsx             # Login/Register
+└── types/                   # TypeScript types
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🚀 Cara Menjalankan
 
-**Use GitHub Codespaces**
+```bash
+# Clone repository
+git clone <YOUR_GIT_URL>
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Masuk ke direktori proyek
+cd <YOUR_PROJECT_NAME>
 
-## What technologies are used for this project?
+# Install dependencies
+npm install
 
-This project is built with:
+# Jalankan development server
+npm run dev
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# Build untuk production
+npm run build
+```
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 📄 Lisensi
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT License
