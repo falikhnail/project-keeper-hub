@@ -20,10 +20,10 @@ interface CalendarViewProps {
 }
 
 const statusColors: Record<string, string> = {
-  active: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
-  completed: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30',
-  'on-hold': 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30',
-  archived: 'bg-slate-500/20 text-slate-600 dark:text-slate-400 border-slate-500/30',
+  active: 'bg-success/20 text-success border-success/30',
+  completed: 'bg-primary/20 text-primary border-primary/30',
+  'on-hold': 'bg-warning/20 text-warning border-warning/30',
+  archived: 'bg-muted text-muted-foreground border-border',
 };
 
 export const CalendarView = ({ projects, onEdit }: CalendarViewProps) => {

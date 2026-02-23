@@ -17,7 +17,7 @@ export const ViewToggle = ({ viewMode, onViewModeChange }: ViewToggleProps) => {
   ];
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
+    <div className="flex items-center gap-0.5 rounded-lg border border-border bg-secondary/50 p-1">
       {views.map(({ mode, icon: Icon, label }) => (
         <Button
           key={mode}
@@ -25,9 +25,9 @@ export const ViewToggle = ({ viewMode, onViewModeChange }: ViewToggleProps) => {
           size="sm"
           onClick={() => onViewModeChange(mode)}
           className={cn(
-            'h-8 gap-2 px-3',
+            'h-8 gap-2 px-3 transition-all',
             viewMode === mode
-              ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
+              ? 'bg-card text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >

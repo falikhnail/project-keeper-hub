@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3 } from 'lucide-react';
@@ -14,6 +14,7 @@ import { CalendarView } from '@/components/CalendarView';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { BulkActionsBar } from '@/components/BulkActionsBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { OnboardingGuide } from '@/components/OnboardingGuide';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -36,6 +37,66 @@ const Index = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(new Set());
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('onboarding_completed');
+  });
+
+  const handleCompleteOnboarding = useCallback(() => {
+    localStorage.setItem('onboarding_completed', 'true');
+    setShowOnboarding(false);
+  }, []);
+
+  const handleSeedSampleData = useCallback(async () => {
+    const sampleProjects: ProjectInput[] = [
+      {
+        name: 'Website Redesign',
+        description: 'Redesign company website with modern UI/UX, improve mobile responsiveness and page load performance.',
+        link: '',
+        status: 'active',
+        tags: ['design', 'frontend'],
+        due_date: new Date(Date.now() + 14 * 86400000),
+        reminder_days: 3,
+      },
+      {
+        name: 'Mobile App MVP',
+        description: 'Build the first version of the mobile app with core features: auth, dashboard, and notifications.',
+        link: '',
+        status: 'active',
+        tags: ['mobile', 'mvp'],
+        due_date: new Date(Date.now() + 30 * 86400000),
+        reminder_days: 5,
+      },
+      {
+        name: 'API Documentation',
+        description: 'Write comprehensive API docs with examples, authentication guides, and rate limit info.',
+        link: '',
+        status: 'on-hold',
+        tags: ['docs', 'backend'],
+        due_date: new Date(Date.now() + 7 * 86400000),
+        reminder_days: 2,
+      },
+      {
+        name: 'Q4 Marketing Campaign',
+        description: 'Plan and execute the Q4 digital marketing campaign across social media and email channels.',
+        link: '',
+        status: 'active',
+        tags: ['marketing', 'campaign'],
+        due_date: new Date(Date.now() + 21 * 86400000),
+        reminder_days: 7,
+      },
+    ];
+
+    for (const project of sampleProjects) {
+      const projectId = await addProject(project);
+      if (projectId) {
+        // Add sample subtasks
+        const subtasks = ['Research & planning', 'Design mockups', 'Implementation', 'Testing & QA'];
+        for (const title of subtasks) {
+          await addSubtask(projectId, title);
+        }
+      }
+    }
+  }, [addProject, addSubtask]);
 
   // Stats
   const stats = useMemo(() => {
@@ -234,6 +295,14 @@ const Index = () => {
 
         {/* Main content */}
         <main className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          {/* Onboarding Guide for new users */}
+          {showOnboarding && projects.length === 0 ? (
+            <OnboardingGuide
+              onComplete={handleCompleteOnboarding}
+              onSeedSampleData={handleSeedSampleData}
+            />
+          ) : (
+            <>
           {/* Stats */}
           <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard
@@ -355,6 +424,8 @@ const Index = () => {
               projects={filteredProjects}
               onEdit={handleEditProject}
             />
+          )}
+            </>
           )}
         </main>
       </div>
