@@ -378,20 +378,13 @@ const Index = () => {
           {/* Projects View */}
           {viewMode === 'grid' ? (
             filteredProjects.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredProjects.map((project, index) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    index={index}
-                    onEdit={handleEditProject}
-                    onDelete={handleDeleteProject}
-                    isSelected={selectedProjectIds.has(project.id)}
-                    onSelectionChange={handleSelectionChange}
-                    selectionMode={selectedProjectIds.size > 0}
-                  />
-                ))}
-              </div>
+              <DraggableGridView
+                projects={filteredProjects}
+                onEdit={handleEditProject}
+                onDelete={handleDeleteProject}
+                selectedProjectIds={selectedProjectIds}
+                onSelectionChange={handleSelectionChange}
+              />
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}
