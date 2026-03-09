@@ -119,6 +119,24 @@ const ProjectDetail = () => {
           </div>
         </header>
 
+        {/* Cover Image Section */}
+        <div className="container mx-auto px-4 pt-6 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="rounded-lg bg-primary/10 p-2"><Image className="h-5 w-5 text-primary" /></div>
+              <h2 className="text-lg font-semibold text-foreground">Cover Image</h2>
+            </div>
+            <ProjectCoverImage
+              projectId={project.id}
+              coverImageUrl={project.cover_image_url}
+              onUploaded={() => refetch()}
+              onRemoved={() => refetch()}
+              editable
+              className="max-h-64 w-full"
+            />
+          </motion.div>
+        </div>
+
         <main className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="rounded-xl border border-border bg-card p-4">
