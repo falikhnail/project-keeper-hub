@@ -11,6 +11,7 @@ import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { CalendarView } from '@/components/CalendarView';
+import { DraggableGridView } from '@/components/DraggableGridView';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { BulkActionsBar } from '@/components/BulkActionsBar';
 import { ThemeToggle } from '@/components/ThemeToggle';

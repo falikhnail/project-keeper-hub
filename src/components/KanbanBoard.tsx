@@ -218,9 +218,9 @@ export const KanbanBoard = ({
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`flex-1 rounded-xl border-2 border-dashed p-3 transition-colors ${
+                    className={`flex-1 rounded-xl border-2 border-dashed p-3 transition-all duration-300 ${
                       snapshot.isDraggingOver
-                        ? 'border-primary bg-primary/5'
+                        ? 'border-primary bg-primary/5 scale-[1.01] shadow-inner'
                         : 'border-border bg-card/30'
                     }`}
                     style={{ minHeight: '400px' }}
