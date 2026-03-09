@@ -13,7 +13,8 @@ import {
   ListTodo,
   Target,
    Paperclip,
-   Save
+   Save,
+   Image
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,6 +27,7 @@ import { CommentsSection } from '@/components/CommentsSection';
 import { DraggableSubtasksList } from '@/components/DraggableSubtasksList';
 import { FileAttachments } from '@/components/FileAttachments';
 import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
+import { ProjectCoverImage } from '@/components/ProjectCoverImage';
  import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
  import { useState } from 'react';
 import { format } from 'date-fns';
