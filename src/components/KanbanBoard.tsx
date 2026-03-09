@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { ExternalLink, User, GripVertical, MoreHorizontal, Eye } from 'lucide-react';
 import { Project } from '@/hooks/useProjects';
+import { ProjectCoverThumbnail } from '@/components/ProjectCoverImage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
