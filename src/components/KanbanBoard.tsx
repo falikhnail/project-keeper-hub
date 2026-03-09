@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { ExternalLink, User, GripVertical, MoreHorizontal, Eye } from 'lucide-react';
 import { Project } from '@/hooks/useProjects';
+import { ProjectCoverThumbnail } from '@/components/ProjectCoverImage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -110,6 +111,12 @@ const KanbanCard = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            {/* Cover Image */}
+            <ProjectCoverThumbnail
+              coverImageUrl={project.cover_image_url}
+              className="mb-2 aspect-video"
+            />
 
             {/* Description */}
             <p className="mb-3 line-clamp-2 text-xs text-muted-foreground">

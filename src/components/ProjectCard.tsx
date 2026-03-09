@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { DueDateBadge } from '@/components/DueDatePicker';
+import { ProjectCoverThumbnail } from '@/components/ProjectCoverImage';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -90,6 +91,12 @@ export const ProjectCard = ({
             />
           </div>
         )}
+
+        {/* Cover Image */}
+        <ProjectCoverThumbnail
+          coverImageUrl={project.cover_image_url}
+          className="mb-4 aspect-video"
+        />
 
         {/* Header */}
         <div className={cn("mb-4 flex items-start justify-between", onSelectionChange && "pl-8")}>
