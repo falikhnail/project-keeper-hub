@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, AlertTriang
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths, isPast } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { Project } from '@/hooks/useProjects';
+import { ProjectCoverThumbnail } from '@/components/ProjectCoverImage';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
