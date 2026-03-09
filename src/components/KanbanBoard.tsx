@@ -112,6 +112,12 @@ const KanbanCard = ({
               </DropdownMenu>
             </div>
 
+            {/* Cover Image */}
+            <ProjectCoverThumbnail
+              coverImageUrl={project.cover_image_url}
+              className="mb-2 aspect-video"
+            />
+
             {/* Description */}
             <p className="mb-3 line-clamp-2 text-xs text-muted-foreground">
               {project.description || 'No description'}
