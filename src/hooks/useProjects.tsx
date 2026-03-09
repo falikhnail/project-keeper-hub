@@ -184,6 +184,7 @@ export const useProjects = () => {
             tags: project.tags,
             due_date: project.due_date ? new Date(project.due_date) : null,
             reminder_days: project.reminder_days ?? 3,
+            cover_image_url: (project as any).cover_image_url || null,
             created_by: project.created_by_profile as unknown as Profile,
             last_handler: project.last_handler_profile as unknown as Profile,
             all_handlers: handlers,
