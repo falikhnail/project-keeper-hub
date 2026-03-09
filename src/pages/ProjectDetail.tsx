@@ -44,7 +44,7 @@ const ProjectDetail = () => {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, reorderSubtasks, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject } = useProjects();
+  const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, reorderSubtasks, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject, refetch } = useProjects();
    const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
 
   if (loading) {
