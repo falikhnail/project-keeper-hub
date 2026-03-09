@@ -164,6 +164,10 @@ export const CalendarView = ({ projects, onEdit }: CalendarViewProps) => {
                       </HoverCardTrigger>
                       <HoverCardContent align="start" className="w-72">
                         <div className="space-y-2">
+                          <ProjectCoverThumbnail
+                            coverImageUrl={project.cover_image_url}
+                            className="aspect-video rounded-md"
+                          />
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="font-semibold text-foreground">
                               {project.name}
