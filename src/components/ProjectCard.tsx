@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { DueDateBadge } from '@/components/DueDatePicker';
+import { ProjectCoverThumbnail } from '@/components/ProjectCoverImage';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
