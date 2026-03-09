@@ -56,9 +56,16 @@ const KanbanCard = ({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className={`group relative mb-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all ${
-            snapshot.isDragging ? 'shadow-lg ring-2 ring-primary/30' : 'hover:border-primary/30'
+          className={`group relative mb-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-200 ${
+            snapshot.isDragging
+              ? 'scale-[1.02] rotate-[1deg] shadow-xl ring-2 ring-primary/30 z-50'
+              : 'hover:border-primary/30 hover:shadow-md'
           }`}
+          style={{
+            transition: snapshot.isDragging
+              ? 'box-shadow 0.2s ease, transform 0.2s ease'
+              : 'all 0.2s ease',
+          }}
         >
           {/* Drag handle */}
           <div
@@ -211,9 +218,9 @@ export const KanbanBoard = ({
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`flex-1 rounded-xl border-2 border-dashed p-3 transition-colors ${
+                    className={`flex-1 rounded-xl border-2 border-dashed p-3 transition-all duration-300 ${
                       snapshot.isDraggingOver
-                        ? 'border-primary bg-primary/5'
+                        ? 'border-primary bg-primary/5 scale-[1.01] shadow-inner'
                         : 'border-border bg-card/30'
                     }`}
                     style={{ minHeight: '400px' }}
