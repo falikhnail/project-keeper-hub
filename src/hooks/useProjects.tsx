@@ -58,6 +58,7 @@ export interface Project {
   tags: string[] | null;
   due_date: Date | null;
   reminder_days: number;
+  cover_image_url: string | null;
   created_by: Profile | null;
   last_handler: Profile | null;
   all_handlers: Profile[];
