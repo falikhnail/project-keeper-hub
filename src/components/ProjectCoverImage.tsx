@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ImagePlus, Upload, X, Loader2 } from 'lucide-react';
+import { ImagePlus, Upload, X, Loader2, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ interface ProjectCoverImageProps {
   editable?: boolean;
   className?: string;
   aspectRatio?: 'video' | 'square';
+  projectUrl?: string | null;
 }
 
 export const ProjectCoverImage = ({
@@ -23,8 +24,10 @@ export const ProjectCoverImage = ({
   editable = false,
   className,
   aspectRatio = 'video',
+  projectUrl,
 }: ProjectCoverImageProps) => {
   const [uploading, setUploading] = useState(false);
+  const [screenshotting, setScreenshotting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -54,7 +57,6 @@ export const ProjectCoverImage = ({
         .from('project-covers')
         .getPublicUrl(filePath);
 
-      // Update project
       const { error: updateError } = await supabase
         .from('projects')
         .update({ cover_image_url: publicUrl } as any)
@@ -68,6 +70,30 @@ export const ProjectCoverImage = ({
       toast({ title: 'Upload failed', description: error.message, variant: 'destructive' });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleAutoScreenshot = async () => {
+    if (!projectUrl) {
+      toast({ title: 'No URL', description: 'Project does not have a URL to screenshot.', variant: 'destructive' });
+      return;
+    }
+
+    setScreenshotting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('screenshot-url', {
+        body: { url: projectUrl, projectId },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Screenshot failed');
+
+      onUploaded(data.url);
+      toast({ title: 'Screenshot captured!', description: 'Cover image updated from project URL.' });
+    } catch (error: any) {
+      toast({ title: 'Screenshot failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setScreenshotting(false);
     }
   };
 
@@ -111,6 +137,12 @@ export const ProjectCoverImage = ({
               <Upload className="mr-1.5 h-3.5 w-3.5" />
               Change
             </Button>
+            {projectUrl && (
+              <Button size="sm" variant="secondary" onClick={handleAutoScreenshot} disabled={screenshotting}>
+                {screenshotting ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Camera className="mr-1.5 h-3.5 w-3.5" />}
+                Re-capture
+              </Button>
+            )}
             <Button size="sm" variant="destructive" onClick={handleRemove}>
               <X className="mr-1.5 h-3.5 w-3.5" />
               Remove
@@ -131,35 +163,53 @@ export const ProjectCoverImage = ({
   if (!editable) return null;
 
   return (
-    <div
-      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={handleDrop}
-      onClick={() => !uploading && fileInputRef.current?.click()}
-      className={cn(
-        'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors',
-        aspectRatio === 'video' ? 'aspect-video' : 'aspect-square',
-        dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/50',
-        className
+    <div className={cn('flex flex-col gap-3', className)}>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => !uploading && fileInputRef.current?.click()}
+        className={cn(
+          'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors',
+          aspectRatio === 'video' ? 'aspect-video' : 'aspect-square',
+          dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/50',
+        )}
+      >
+        {uploading ? (
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        ) : (
+          <>
+            <ImagePlus className="h-8 w-8 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">
+              Drop image or click to upload
+            </span>
+          </>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+        />
+      </div>
+
+      {projectUrl && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleAutoScreenshot}
+          disabled={screenshotting}
+          className="gap-2 self-start"
+        >
+          {screenshotting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Camera className="h-4 w-4" />
+          )}
+          {screenshotting ? 'Capturing screenshot...' : 'Auto-screenshot from URL'}
+        </Button>
       )}
-    >
-      {uploading ? (
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      ) : (
-        <>
-          <ImagePlus className="h-8 w-8 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">
-            Drop image or click to upload
-          </span>
-        </>
-      )}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
-      />
     </div>
   );
 };

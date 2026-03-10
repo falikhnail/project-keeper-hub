@@ -133,6 +133,7 @@ const ProjectDetail = () => {
               onRemoved={() => refetch()}
               editable
               className="max-h-64 w-full"
+              projectUrl={project.link}
             />
           </motion.div>
         </div>
