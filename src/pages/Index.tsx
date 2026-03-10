@@ -271,6 +271,7 @@ const Index = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10 border border-border">
+                        <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || 'Avatar'} />
                         <AvatarFallback className="bg-primary/10 text-primary">
                           {userInitials}
                         </AvatarFallback>
