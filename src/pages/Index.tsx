@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3 } from 'lucide-react';
+import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3, User } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
