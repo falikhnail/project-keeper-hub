@@ -17,7 +17,7 @@ import { BulkActionsBar } from '@/components/BulkActionsBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { OnboardingGuide } from '@/components/OnboardingGuide';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
