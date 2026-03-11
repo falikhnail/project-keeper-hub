@@ -104,17 +104,20 @@ export const ProjectCard = ({
         )}
 
         {/* Header */}
-        <div className={cn("mb-4 flex items-start justify-between", onSelectionChange && "pl-8")}>
+        <div className={cn(compact ? "mb-2" : "mb-4", "flex items-start justify-between", onSelectionChange && "pl-8")}>
           <div className="flex-1">
-            <div className="mb-2 flex flex-wrap items-center gap-2">
+            <div className={cn(compact ? "mb-1" : "mb-2", "flex flex-wrap items-center gap-2")}>
               <Badge variant="outline" className={status.className}>
                 {status.label}
               </Badge>
-              <DueDateBadge dueDate={project.due_date} reminderDays={project.reminder_days} />
+              {!compact && <DueDateBadge dueDate={project.due_date} reminderDays={project.reminder_days} />}
             </div>
             <h3 
               onClick={() => navigate(`/project/${project.id}`)}
-              className="cursor-pointer text-lg font-semibold text-foreground transition-colors group-hover:text-primary hover:underline"
+              className={cn(
+                "cursor-pointer font-semibold text-foreground transition-colors group-hover:text-primary hover:underline",
+                compact ? "text-sm" : "text-lg"
+              )}
             >
               {project.name}
             </h3>
