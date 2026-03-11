@@ -45,6 +45,7 @@ export const ProjectCard = ({
   isSelected = false,
   onSelectionChange,
   selectionMode = false,
+  compact = false,
 }: ProjectCardProps) => {
   const navigate = useNavigate();
   const status = statusConfig[project.status];
