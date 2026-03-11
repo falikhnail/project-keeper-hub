@@ -74,8 +74,9 @@ export const ProjectCard = ({
         isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
       )} />
 
-      <div className={cn(
-        "relative flex h-full flex-col rounded-xl border bg-card p-5 shadow-card transition-all duration-300",
+       <div className={cn(
+        "relative flex h-full flex-col rounded-xl border bg-card shadow-card transition-all duration-300",
+        compact ? "p-3" : "p-5",
         isSelected 
           ? "border-primary ring-2 ring-primary/20" 
           : "border-border group-hover:border-primary/30 group-hover:shadow-card-hover"
