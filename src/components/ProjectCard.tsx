@@ -191,6 +191,7 @@ export const ProjectCard = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9 border border-border">
+                  <AvatarImage src={handler?.avatar_url || undefined} alt={handler?.display_name || 'Handler'} />
                   <AvatarFallback className="bg-secondary text-xs font-medium">
                     {initials}
                   </AvatarFallback>
