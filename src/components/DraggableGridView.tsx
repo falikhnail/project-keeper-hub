@@ -11,6 +11,7 @@ interface DraggableGridViewProps {
   onDelete: (id: string) => void;
   selectedProjectIds: Set<string>;
   onSelectionChange: (id: string, selected: boolean) => void;
+  compact?: boolean;
 }
 
 export const DraggableGridView = ({
