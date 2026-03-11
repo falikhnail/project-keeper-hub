@@ -8,7 +8,7 @@ import {
   Clock
 } from 'lucide-react';
 import { ProjectActivity } from '@/hooks/useProjects';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format, formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -69,6 +69,7 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
               <div className="mt-2 flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6 border border-border">
+                    <AvatarImage src={activity.handler?.avatar_url || undefined} alt={handlerName} />
                     <AvatarFallback className="bg-secondary text-[10px] font-medium">
                       {initials}
                     </AvatarFallback>
