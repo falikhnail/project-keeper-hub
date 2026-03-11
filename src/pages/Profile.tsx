@@ -150,14 +150,14 @@ const Profile = () => {
                 </CardTitle>
                 <CardDescription>Click on the avatar to upload a new photo</CardDescription>
               </CardHeader>
-              <CardContent className="flex items-center gap-6">
+              <CardContent className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
                 <div
-                  className="group relative cursor-pointer"
+                  className="group relative shrink-0 cursor-pointer"
                   onClick={() => !uploadingAvatar && fileInputRef.current?.click()}
                 >
-                  <Avatar className="h-24 w-24 border-2 border-border transition-all group-hover:border-primary/50">
-                    <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || 'Avatar'} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
+                  <Avatar className="h-28 w-28 border-4 border-border shadow-lg transition-all group-hover:border-primary/50">
+                    <AvatarImage src={profile.avatar_url || undefined} alt={profile.display_name || 'Avatar'} className="object-cover" />
+                    <AvatarFallback className="bg-primary/10 text-primary text-3xl font-semibold">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
@@ -176,9 +176,10 @@ const Profile = () => {
                     onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])}
                   />
                 </div>
-                <div>
-                  <p className="font-medium text-foreground">{profile.display_name || 'No name set'}</p>
+                <div className="text-center sm:text-left">
+                  <p className="text-lg font-semibold text-foreground">{profile.display_name || 'No name set'}</p>
                   <p className="text-sm text-muted-foreground">{profile.email}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Click avatar to change photo</p>
                 </div>
               </CardContent>
             </Card>

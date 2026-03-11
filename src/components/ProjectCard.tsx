@@ -4,7 +4,7 @@ import { ExternalLink, User, Mail, Calendar, MoreHorizontal, Eye } from 'lucide-
 import { Project } from '@/hooks/useProjects';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
@@ -191,6 +191,7 @@ export const ProjectCard = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9 border border-border">
+                  <AvatarImage src={handler?.avatar_url || undefined} alt={handler?.display_name || 'Handler'} />
                   <AvatarFallback className="bg-secondary text-xs font-medium">
                     {initials}
                   </AvatarFallback>
