@@ -96,10 +96,12 @@ export const ProjectCard = ({
         )}
 
         {/* Cover Image */}
-        <ProjectCoverThumbnail
-          coverImageUrl={project.cover_image_url}
-          className="mb-4 aspect-video"
-        />
+        {!compact && (
+          <ProjectCoverThumbnail
+            coverImageUrl={project.cover_image_url}
+            className="mb-4 aspect-video"
+          />
+        )}
 
         {/* Header */}
         <div className={cn("mb-4 flex items-start justify-between", onSelectionChange && "pl-8")}>
