@@ -78,6 +78,7 @@ export const DraggableGridView = ({
                         isSelected={selectedProjectIds.has(project.id)}
                         onSelectionChange={onSelectionChange}
                         selectionMode={selectedProjectIds.size > 0}
+                        compact={compact}
                       />
                     </div>
                   )}

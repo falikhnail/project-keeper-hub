@@ -185,32 +185,34 @@ export const ProjectCard = ({
         )}
 
         {/* Divider */}
-        <div className="my-3 h-px bg-border" />
-
-        {/* Last Handler */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9 border border-border">
-              <AvatarFallback className="bg-secondary text-xs font-medium">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                <User className="h-3 w-3 text-muted-foreground" />
-                <span className="truncate">{handler?.display_name || 'Unknown'}</span>
+        {!compact && (
+          <>
+            <div className="my-3 h-px bg-border" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-9 w-9 border border-border">
+                  <AvatarFallback className="bg-secondary text-xs font-medium">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                    <User className="h-3 w-3 text-muted-foreground" />
+                    <span className="truncate">{handler?.display_name || 'Unknown'}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <span className="truncate">{handler?.email || 'No email'}</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Mail className="h-3 w-3" />
-                <span className="truncate">{handler?.email || 'No email'}</span>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>{format(project.updated_at, 'dd MMM yyyy', { locale: id })}</span>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            <span>{format(project.updated_at, 'dd MMM yyyy', { locale: id })}</span>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </motion.div>
   );

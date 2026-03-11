@@ -405,6 +405,7 @@ const Index = () => {
                 onDelete={handleDeleteProject}
                 selectedProjectIds={selectedProjectIds}
                 onSelectionChange={handleSelectionChange}
+                compact={compactView}
               />
             ) : (
               <motion.div
