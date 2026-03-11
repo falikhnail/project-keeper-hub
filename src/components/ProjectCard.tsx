@@ -27,6 +27,7 @@ interface ProjectCardProps {
   isSelected?: boolean;
   onSelectionChange?: (id: string, selected: boolean) => void;
   selectionMode?: boolean;
+  compact?: boolean;
 }
 
 const statusConfig = {
