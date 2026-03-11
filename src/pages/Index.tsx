@@ -242,7 +242,7 @@ const Index = () => {
 
       <div className="relative">
         {/* Header */}
-        <header className="border-b border-border bg-card/50 backdrop-blur-xl">
+        <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <motion.div
