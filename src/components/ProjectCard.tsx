@@ -150,12 +150,15 @@ export const ProjectCard = ({
         </div>
 
         {/* Description */}
-        <p className="mb-4 line-clamp-2 flex-1 text-sm text-muted-foreground">
+        <p className={cn(
+          "flex-1 text-sm text-muted-foreground",
+          compact ? "mb-2 line-clamp-1" : "mb-4 line-clamp-2"
+        )}>
           {project.description || 'No description'}
         </p>
 
         {/* Tags */}
-        {project.tags && project.tags.length > 0 && (
+        {!compact && project.tags && project.tags.length > 0 && (
           <div className="mb-4 flex flex-wrap gap-1.5">
             {project.tags.map((tag) => (
               <span
@@ -169,7 +172,7 @@ export const ProjectCard = ({
         )}
 
         {/* Link */}
-        {project.link && (
+        {!compact && project.link && (
           <a
             href={project.link}
             target="_blank"
