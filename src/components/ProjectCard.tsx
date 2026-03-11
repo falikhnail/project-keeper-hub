@@ -27,6 +27,7 @@ interface ProjectCardProps {
   isSelected?: boolean;
   onSelectionChange?: (id: string, selected: boolean) => void;
   selectionMode?: boolean;
+  compact?: boolean;
 }
 
 const statusConfig = {
@@ -44,6 +45,7 @@ export const ProjectCard = ({
   isSelected = false,
   onSelectionChange,
   selectionMode = false,
+  compact = false,
 }: ProjectCardProps) => {
   const navigate = useNavigate();
   const status = statusConfig[project.status];
@@ -72,8 +74,9 @@ export const ProjectCard = ({
         isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
       )} />
 
-      <div className={cn(
-        "relative flex h-full flex-col rounded-xl border bg-card p-5 shadow-card transition-all duration-300",
+       <div className={cn(
+        "relative flex h-full flex-col rounded-xl border bg-card shadow-card transition-all duration-300",
+        compact ? "p-3" : "p-5",
         isSelected 
           ? "border-primary ring-2 ring-primary/20" 
           : "border-border group-hover:border-primary/30 group-hover:shadow-card-hover"
@@ -93,23 +96,28 @@ export const ProjectCard = ({
         )}
 
         {/* Cover Image */}
-        <ProjectCoverThumbnail
-          coverImageUrl={project.cover_image_url}
-          className="mb-4 aspect-video"
-        />
+        {!compact && (
+          <ProjectCoverThumbnail
+            coverImageUrl={project.cover_image_url}
+            className="mb-4 aspect-video"
+          />
+        )}
 
         {/* Header */}
-        <div className={cn("mb-4 flex items-start justify-between", onSelectionChange && "pl-8")}>
+        <div className={cn(compact ? "mb-2" : "mb-4", "flex items-start justify-between", onSelectionChange && "pl-8")}>
           <div className="flex-1">
-            <div className="mb-2 flex flex-wrap items-center gap-2">
+            <div className={cn(compact ? "mb-1" : "mb-2", "flex flex-wrap items-center gap-2")}>
               <Badge variant="outline" className={status.className}>
                 {status.label}
               </Badge>
-              <DueDateBadge dueDate={project.due_date} reminderDays={project.reminder_days} />
+              {!compact && <DueDateBadge dueDate={project.due_date} reminderDays={project.reminder_days} />}
             </div>
             <h3 
               onClick={() => navigate(`/project/${project.id}`)}
-              className="cursor-pointer text-lg font-semibold text-foreground transition-colors group-hover:text-primary hover:underline"
+              className={cn(
+                "cursor-pointer font-semibold text-foreground transition-colors group-hover:text-primary hover:underline",
+                compact ? "text-sm" : "text-lg"
+              )}
             >
               {project.name}
             </h3>
@@ -142,12 +150,15 @@ export const ProjectCard = ({
         </div>
 
         {/* Description */}
-        <p className="mb-4 line-clamp-2 flex-1 text-sm text-muted-foreground">
+        <p className={cn(
+          "flex-1 text-sm text-muted-foreground",
+          compact ? "mb-2 line-clamp-1" : "mb-4 line-clamp-2"
+        )}>
           {project.description || 'No description'}
         </p>
 
         {/* Tags */}
-        {project.tags && project.tags.length > 0 && (
+        {!compact && project.tags && project.tags.length > 0 && (
           <div className="mb-4 flex flex-wrap gap-1.5">
             {project.tags.map((tag) => (
               <span
@@ -161,7 +172,7 @@ export const ProjectCard = ({
         )}
 
         {/* Link */}
-        {project.link && (
+        {!compact && project.link && (
           <a
             href={project.link}
             target="_blank"
@@ -174,32 +185,34 @@ export const ProjectCard = ({
         )}
 
         {/* Divider */}
-        <div className="my-3 h-px bg-border" />
-
-        {/* Last Handler */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9 border border-border">
-              <AvatarFallback className="bg-secondary text-xs font-medium">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                <User className="h-3 w-3 text-muted-foreground" />
-                <span className="truncate">{handler?.display_name || 'Unknown'}</span>
+        {!compact && (
+          <>
+            <div className="my-3 h-px bg-border" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-9 w-9 border border-border">
+                  <AvatarFallback className="bg-secondary text-xs font-medium">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                    <User className="h-3 w-3 text-muted-foreground" />
+                    <span className="truncate">{handler?.display_name || 'Unknown'}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <span className="truncate">{handler?.email || 'No email'}</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Mail className="h-3 w-3" />
-                <span className="truncate">{handler?.email || 'No email'}</span>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>{format(project.updated_at, 'dd MMM yyyy', { locale: id })}</span>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            <span>{format(project.updated_at, 'dd MMM yyyy', { locale: id })}</span>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </motion.div>
   );

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3, User } from 'lucide-react';
@@ -38,9 +38,25 @@ const Index = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(new Set());
+  const [compactView, setCompactView] = useState(() => localStorage.getItem('pref_compact_view') === 'true');
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('onboarding_completed');
   });
+
+  // Listen for compact view preference changes
+  useEffect(() => {
+    const handleStorage = () => {
+      setCompactView(localStorage.getItem('pref_compact_view') === 'true');
+    };
+    window.addEventListener('storage', handleStorage);
+    // Also poll on focus for same-tab changes
+    const handleFocus = () => handleStorage();
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   const handleCompleteOnboarding = useCallback(() => {
     localStorage.setItem('onboarding_completed', 'true');
@@ -389,6 +405,7 @@ const Index = () => {
                 onDelete={handleDeleteProject}
                 selectedProjectIds={selectedProjectIds}
                 onSelectionChange={handleSelectionChange}
+                compact={compactView}
               />
             ) : (
               <motion.div

@@ -11,6 +11,7 @@ interface DraggableGridViewProps {
   onDelete: (id: string) => void;
   selectedProjectIds: Set<string>;
   onSelectionChange: (id: string, selected: boolean) => void;
+  compact?: boolean;
 }
 
 export const DraggableGridView = ({
@@ -19,6 +20,7 @@ export const DraggableGridView = ({
   onDelete,
   selectedProjectIds,
   onSelectionChange,
+  compact = false,
 }: DraggableGridViewProps) => {
   const [orderedProjects, setOrderedProjects] = useState<Project[]>(projects);
 
@@ -41,7 +43,7 @@ export const DraggableGridView = ({
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            className={`grid sm:grid-cols-2 ${compact ? 'gap-2 lg:grid-cols-4' : 'gap-4 lg:grid-cols-3'}`}
           >
             <AnimatePresence mode="popLayout">
               {orderedProjects.map((project, index) => (
@@ -76,6 +78,7 @@ export const DraggableGridView = ({
                         isSelected={selectedProjectIds.has(project.id)}
                         onSelectionChange={onSelectionChange}
                         selectionMode={selectedProjectIds.size > 0}
+                        compact={compact}
                       />
                     </div>
                   )}
