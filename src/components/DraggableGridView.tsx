@@ -20,6 +20,7 @@ export const DraggableGridView = ({
   onDelete,
   selectedProjectIds,
   onSelectionChange,
+  compact = false,
 }: DraggableGridViewProps) => {
   const [orderedProjects, setOrderedProjects] = useState<Project[]>(projects);
 
