@@ -8,7 +8,7 @@ import {
   Clock
 } from 'lucide-react';
 import { ProjectActivity } from '@/hooks/useProjects';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format, formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 
