@@ -1,10 +1,12 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3, User } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { ProjectCard } from '@/components/ProjectCard';
 import { AddProjectDialogDB } from '@/components/AddProjectDialogDB';
 import { StatsCard } from '@/components/StatsCard';
@@ -30,6 +32,7 @@ type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { profile, signOut } = useAuth();
  const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +60,34 @@ const Index = () => {
       window.removeEventListener('focus', handleFocus);
     };
   }, []);
+
+  // Handle invite acceptance
+  const { toast } = useToast();
+  useEffect(() => {
+    const inviteToken = searchParams.get('invite');
+    if (!inviteToken) return;
+
+    const acceptInvite = async () => {
+      const { data, error } = await supabase.rpc('accept_invitation', {
+        invitation_token: inviteToken,
+      });
+
+      if (error) {
+        toast({ title: 'Error', description: 'Failed to accept invitation', variant: 'destructive' });
+      } else if (data && typeof data === 'object' && 'success' in data) {
+        const result = data as { success: boolean; error?: string };
+        if (result.success) {
+          toast({ title: 'Invitation accepted!', description: 'You have been added to the project' });
+        } else {
+          toast({ title: 'Error', description: result.error || 'Invalid invitation', variant: 'destructive' });
+        }
+      }
+      searchParams.delete('invite');
+      setSearchParams(searchParams, { replace: true });
+    };
+
+    acceptInvite();
+  }, [searchParams, setSearchParams, toast]);
 
   const handleCompleteOnboarding = useCallback(() => {
     localStorage.setItem('onboarding_completed', 'true');

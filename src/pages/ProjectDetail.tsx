@@ -28,7 +28,8 @@ import { DraggableSubtasksList } from '@/components/DraggableSubtasksList';
 import { FileAttachments } from '@/components/FileAttachments';
 import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
 import { ProjectCoverImage } from '@/components/ProjectCoverImage';
- import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
+import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
+import { TeamManagement } from '@/components/TeamManagement';
  import { useState } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -110,10 +111,13 @@ const ProjectDetail = () => {
                     </a>
                   </Button>
                 )}
-                 <Button variant="outline" onClick={() => setSaveTemplateOpen(true)} className="gap-2">
-                   <Save className="h-4 w-4" />
-                   Save as Template
-                 </Button>
+                 <div className="flex gap-2">
+                   <TeamManagement projectId={project.id} projectName={project.name} />
+                   <Button variant="outline" onClick={() => setSaveTemplateOpen(true)} className="gap-2">
+                     <Save className="h-4 w-4" />
+                     Save as Template
+                   </Button>
+                 </div>
               </div>
             </motion.div>
           </div>
