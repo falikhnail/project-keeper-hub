@@ -111,10 +111,13 @@ const ProjectDetail = () => {
                     </a>
                   </Button>
                 )}
-                 <Button variant="outline" onClick={() => setSaveTemplateOpen(true)} className="gap-2">
-                   <Save className="h-4 w-4" />
-                   Save as Template
-                 </Button>
+                 <div className="flex gap-2">
+                   <TeamManagement projectId={project.id} projectName={project.name} />
+                   <Button variant="outline" onClick={() => setSaveTemplateOpen(true)} className="gap-2">
+                     <Save className="h-4 w-4" />
+                     Save as Template
+                   </Button>
+                 </div>
               </div>
             </motion.div>
           </div>
