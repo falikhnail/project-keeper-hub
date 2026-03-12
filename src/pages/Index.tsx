@@ -5,6 +5,8 @@ import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, Ba
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { ProjectCard } from '@/components/ProjectCard';
 import { AddProjectDialogDB } from '@/components/AddProjectDialogDB';
 import { StatsCard } from '@/components/StatsCard';
