@@ -61,6 +61,34 @@ const Index = () => {
     };
   }, []);
 
+  // Handle invite acceptance
+  const { toast } = useToast();
+  useEffect(() => {
+    const inviteToken = searchParams.get('invite');
+    if (!inviteToken) return;
+
+    const acceptInvite = async () => {
+      const { data, error } = await supabase.rpc('accept_invitation', {
+        invitation_token: inviteToken,
+      });
+
+      if (error) {
+        toast({ title: 'Error', description: 'Failed to accept invitation', variant: 'destructive' });
+      } else if (data && typeof data === 'object' && 'success' in data) {
+        const result = data as { success: boolean; error?: string };
+        if (result.success) {
+          toast({ title: 'Invitation accepted!', description: 'You have been added to the project' });
+        } else {
+          toast({ title: 'Error', description: result.error || 'Invalid invitation', variant: 'destructive' });
+        }
+      }
+      searchParams.delete('invite');
+      setSearchParams(searchParams, { replace: true });
+    };
+
+    acceptInvite();
+  }, [searchParams, setSearchParams, toast]);
+
   const handleCompleteOnboarding = useCallback(() => {
     localStorage.setItem('onboarding_completed', 'true');
     setShowOnboarding(false);
