@@ -30,6 +30,7 @@ type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'archived';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { profile, signOut } = useAuth();
  const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
