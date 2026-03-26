@@ -33,6 +33,7 @@ import { ProjectCoverImage } from '@/components/ProjectCoverImage';
 import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
 import { TeamManagement } from '@/components/TeamManagement';
 import { TimeTracker } from '@/components/TimeTracker';
+import { AIAssistant } from '@/components/AIAssistant';
  import { useState } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
