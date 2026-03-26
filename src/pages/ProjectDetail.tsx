@@ -326,8 +326,15 @@ const ProjectDetail = () => {
                       comments: project.comments.map(c => ({ content: c.content })),
                     }}
                     onApplyDescription={async (desc) => {
-                      await updateProject(project.id, { description: desc });
-                      refetch();
+                      await updateProject(project.id, {
+                        name: project.name,
+                        description: desc,
+                        link: project.link || '',
+                        status: project.status,
+                        tags: project.tags || [],
+                        due_date: project.due_date ? new Date(project.due_date) : undefined,
+                        reminder_days: project.reminder_days,
+                      });
                     }}
                   />
                 </div>
