@@ -304,6 +304,35 @@ const ProjectDetail = () => {
                 </div>
               </motion.div>
 
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2"><Sparkles className="h-5 w-5 text-primary" /></div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-foreground">AI Assistant</h2>
+                      <p className="text-sm text-muted-foreground">Insight & saran otomatis</p>
+                    </div>
+                  </div>
+                  <AIAssistant
+                    projectData={{
+                      name: project.name,
+                      description: project.description,
+                      status: project.status,
+                      dueDate: project.due_date ? format(project.due_date, 'yyyy-MM-dd') : null,
+                      tags: project.tags,
+                      handlers: project.all_handlers.map(h => ({ display_name: h.display_name, email: h.email })),
+                      subtasks: (project.subtasks || []).map(s => ({ title: s.title, completed: s.completed })),
+                      activities: project.activities.map(a => ({ description: a.description })),
+                      comments: project.comments.map(c => ({ content: c.content })),
+                    }}
+                    onApplyDescription={async (desc) => {
+                      await updateProject(project.id, { description: desc });
+                      refetch();
+                    }}
+                  />
+                </div>
+              </motion.div>
+
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                 <div className="rounded-xl border border-border bg-card p-6">
                   <div className="mb-6 flex items-center gap-3">
