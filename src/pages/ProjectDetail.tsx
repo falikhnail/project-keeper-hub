@@ -12,9 +12,10 @@ import {
   MessageSquare,
   ListTodo,
   Target,
-   Paperclip,
-   Save,
-   Image
+  Paperclip,
+  Save,
+  Image,
+  Timer
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
