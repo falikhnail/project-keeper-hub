@@ -15,7 +15,8 @@ import {
   Paperclip,
   Save,
   Image,
-  Timer
+  Timer,
+  Sparkles
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
