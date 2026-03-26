@@ -12,9 +12,10 @@ import {
   MessageSquare,
   ListTodo,
   Target,
-   Paperclip,
-   Save,
-   Image
+  Paperclip,
+  Save,
+  Image,
+  Timer
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +31,7 @@ import { DueDatePicker, DueDateBadge } from '@/components/DueDatePicker';
 import { ProjectCoverImage } from '@/components/ProjectCoverImage';
 import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
 import { TeamManagement } from '@/components/TeamManagement';
+import { TimeTracker } from '@/components/TimeTracker';
  import { useState } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -223,7 +225,20 @@ const ProjectDetail = () => {
                 />
               </div>
 
-              {/* File Attachments */}
+              {/* Time Tracking */}
+              <div className="rounded-xl border border-border bg-card p-6">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2"><Timer className="h-5 w-5 text-primary" /></div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Time Tracking</h2>
+                    <p className="text-sm text-muted-foreground">Lacak waktu kerja project</p>
+                  </div>
+                </div>
+                <TimeTracker
+                  projectId={project.id}
+                  subtasks={(project.subtasks || []).map(s => ({ id: s.id, title: s.title }))}
+                />
+              </div>
               <div className="rounded-xl border border-border bg-card p-6">
                 <div className="mb-6 flex items-center gap-3">
                   <div className="rounded-lg bg-primary/10 p-2"><Paperclip className="h-5 w-5 text-primary" /></div>
