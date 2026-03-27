@@ -76,6 +76,7 @@ export const AddProjectDialogDB = ({
     setReminderDays(3);
      setSelectedTemplate(null);
      setInitialSubtasks([]);
+     setTemplateHandlerIds([]);
      setTemplateOpen(false);
   };
  
