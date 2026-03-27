@@ -35,7 +35,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { profile, signOut } = useAuth();
- const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask } = useProjects();
+ const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask, addHandler } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
