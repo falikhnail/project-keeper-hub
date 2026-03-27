@@ -167,6 +167,9 @@ export const useProjects = () => {
             order_position: s.order_position,
             created_by: s.profiles as unknown as Profile,
             created_at: new Date(s.created_at),
+            start_date: s.start_date ? new Date(s.start_date) : null,
+            end_date: s.end_date ? new Date(s.end_date) : null,
+            dependencies: s.dependencies || [],
           }));
           const attachments: ProjectAttachment[] = (attachmentsData || []).map((a: any) => ({
             id: a.id,
