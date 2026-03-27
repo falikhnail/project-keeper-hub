@@ -49,6 +49,7 @@ export const AddProjectDialogDB = ({
    const [templateOpen, setTemplateOpen] = useState(false);
    const [selectedTemplate, setSelectedTemplate] = useState<ProjectTemplate | null>(null);
    const [initialSubtasks, setInitialSubtasks] = useState<string[]>([]);
+   const [templateHandlerIds, setTemplateHandlerIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (editingProject) {
