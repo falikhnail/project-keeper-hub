@@ -202,7 +202,6 @@ const Index = () => {
        }
        // Auto-assign handlers from template
        if (projectId && templateHandlerIds && templateHandlerIds.length > 0) {
-         const { addHandler } = useProjectsRef.current;
          for (const handlerId of templateHandlerIds) {
            await addHandler(projectId, handlerId);
          }
