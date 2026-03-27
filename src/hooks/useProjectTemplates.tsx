@@ -10,6 +10,7 @@
    default_tags: string[];
    default_reminder_days: number;
    subtask_titles: string[];
+   default_handler_ids: string[];
    created_at: Date;
    updated_at: Date;
  }
@@ -20,6 +21,7 @@
    default_tags: string[];
    default_reminder_days: number;
    subtask_titles: string[];
+   default_handler_ids?: string[];
  }
  
  export const useProjectTemplates = () => {
