@@ -27,7 +27,7 @@ import { DueDatePicker } from '@/components/DueDatePicker';
 interface AddProjectDialogDBProps {
   open: boolean;
   onClose: () => void;
-   onSave: (project: ProjectInput, initialSubtasks?: string[]) => Promise<void>;
+   onSave: (project: ProjectInput, initialSubtasks?: string[], templateHandlerIds?: string[]) => Promise<void>;
   editingProject?: Project | null;
 }
 
@@ -49,6 +49,7 @@ export const AddProjectDialogDB = ({
    const [templateOpen, setTemplateOpen] = useState(false);
    const [selectedTemplate, setSelectedTemplate] = useState<ProjectTemplate | null>(null);
    const [initialSubtasks, setInitialSubtasks] = useState<string[]>([]);
+   const [templateHandlerIds, setTemplateHandlerIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (editingProject) {
@@ -75,6 +76,7 @@ export const AddProjectDialogDB = ({
     setReminderDays(3);
      setSelectedTemplate(null);
      setInitialSubtasks([]);
+     setTemplateHandlerIds([]);
      setTemplateOpen(false);
   };
  
@@ -83,6 +85,7 @@ export const AddProjectDialogDB = ({
      setTags(template.default_tags);
      setReminderDays(template.default_reminder_days);
      setInitialSubtasks(template.subtask_titles);
+     setTemplateHandlerIds(template.default_handler_ids || []);
      setTemplateOpen(false);
    };
 
@@ -111,7 +114,7 @@ export const AddProjectDialogDB = ({
         tags,
         due_date: dueDate,
         reminder_days: reminderDays,
-       }, initialSubtasks);
+       }, initialSubtasks, templateHandlerIds);
       resetForm();
     } finally {
       setSaving(false);

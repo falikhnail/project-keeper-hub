@@ -341,6 +341,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          default_handler_ids: string[] | null
           default_reminder_days: number | null
           default_tags: string[] | null
           description: string | null
@@ -352,6 +353,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          default_handler_ids?: string[] | null
           default_reminder_days?: number | null
           default_tags?: string[] | null
           description?: string | null
@@ -363,6 +365,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          default_handler_ids?: string[] | null
           default_reminder_days?: number | null
           default_tags?: string[] | null
           description?: string | null
@@ -440,6 +443,60 @@ export type Database = {
             columns: ["last_handler_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_tasks: {
+        Row: {
+          created_at: string
+          created_by: string
+          cron_expression: string
+          id: string
+          is_active: boolean
+          last_run_at: string | null
+          name_prefix: string
+          next_run_at: string | null
+          template_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          cron_expression?: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          name_prefix?: string
+          next_run_at?: string | null
+          template_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          cron_expression?: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          name_prefix?: string
+          next_run_at?: string | null
+          template_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_tasks_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "project_templates"
             referencedColumns: ["id"]
           },
         ]

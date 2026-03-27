@@ -10,6 +10,7 @@
    default_tags: string[];
    default_reminder_days: number;
    subtask_titles: string[];
+   default_handler_ids: string[];
    created_at: Date;
    updated_at: Date;
  }
@@ -20,6 +21,7 @@
    default_tags: string[];
    default_reminder_days: number;
    subtask_titles: string[];
+   default_handler_ids?: string[];
  }
  
  export const useProjectTemplates = () => {
@@ -50,6 +52,7 @@
          default_tags: t.default_tags || [],
          default_reminder_days: t.default_reminder_days ?? 3,
          subtask_titles: t.subtask_titles || [],
+         default_handler_ids: t.default_handler_ids || [],
          created_at: new Date(t.created_at),
          updated_at: new Date(t.updated_at),
        }));
@@ -78,6 +81,7 @@
            default_tags: input.default_tags,
            default_reminder_days: input.default_reminder_days,
            subtask_titles: input.subtask_titles,
+           default_handler_ids: input.default_handler_ids || [],
            created_by: profile.id,
          } as any)
          .select()

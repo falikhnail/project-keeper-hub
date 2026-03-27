@@ -19,6 +19,7 @@ import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { BulkActionsBar } from '@/components/BulkActionsBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { OnboardingGuide } from '@/components/OnboardingGuide';
+import { RecurringTasksManager } from '@/components/RecurringTasksManager';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -35,7 +36,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { profile, signOut } = useAuth();
- const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask } = useProjects();
+ const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask, addHandler } = useProjects();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -189,7 +190,7 @@ const Index = () => {
     setStatusFilters([]);
   };
 
-   const handleAddProject = async (input: ProjectInput, initialSubtasks?: string[]) => {
+   const handleAddProject = async (input: ProjectInput, initialSubtasks?: string[], templateHandlerIds?: string[]) => {
     if (editingProject) {
       await updateProject(editingProject.id, input);
     } else {
@@ -198,6 +199,12 @@ const Index = () => {
        if (projectId && initialSubtasks && initialSubtasks.length > 0) {
          for (const title of initialSubtasks) {
            await addSubtask(projectId, title);
+         }
+       }
+       // Auto-assign handlers from template
+       if (projectId && templateHandlerIds && templateHandlerIds.length > 0) {
+         for (const handlerId of templateHandlerIds) {
+           await addHandler(projectId, handlerId);
          }
        }
     }
@@ -388,6 +395,16 @@ const Index = () => {
               index={3}
             />
           </div>
+
+          {/* Recurring Tasks */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="mb-8 rounded-xl border border-border bg-card p-6"
+          >
+            <RecurringTasksManager />
+          </motion.div>
 
           {/* Search & Filter */}
           <motion.div
