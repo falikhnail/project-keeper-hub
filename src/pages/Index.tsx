@@ -189,7 +189,7 @@ const Index = () => {
     setStatusFilters([]);
   };
 
-   const handleAddProject = async (input: ProjectInput, initialSubtasks?: string[]) => {
+   const handleAddProject = async (input: ProjectInput, initialSubtasks?: string[], templateHandlerIds?: string[]) => {
     if (editingProject) {
       await updateProject(editingProject.id, input);
     } else {
@@ -198,6 +198,13 @@ const Index = () => {
        if (projectId && initialSubtasks && initialSubtasks.length > 0) {
          for (const title of initialSubtasks) {
            await addSubtask(projectId, title);
+         }
+       }
+       // Auto-assign handlers from template
+       if (projectId && templateHandlerIds && templateHandlerIds.length > 0) {
+         const { addHandler } = useProjectsRef.current;
+         for (const handlerId of templateHandlerIds) {
+           await addHandler(projectId, handlerId);
          }
        }
     }
