@@ -114,7 +114,7 @@ export const AddProjectDialogDB = ({
         tags,
         due_date: dueDate,
         reminder_days: reminderDays,
-       }, initialSubtasks);
+       }, initialSubtasks, templateHandlerIds);
       resetForm();
     } finally {
       setSaving(false);
