@@ -81,6 +81,7 @@
            default_tags: input.default_tags,
            default_reminder_days: input.default_reminder_days,
            subtask_titles: input.subtask_titles,
+           default_handler_ids: input.default_handler_ids || [],
            created_by: profile.id,
          } as any)
          .select()
