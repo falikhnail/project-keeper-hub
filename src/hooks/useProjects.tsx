@@ -37,6 +37,9 @@ export interface ProjectSubtask {
   order_position: number;
   created_by: Profile | null;
   created_at: Date;
+  start_date: Date | null;
+  end_date: Date | null;
+  dependencies: string[];
 }
 
 export interface ProjectAttachment {
