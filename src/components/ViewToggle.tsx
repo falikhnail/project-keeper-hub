@@ -1,8 +1,8 @@
-import { LayoutGrid, Columns3, CalendarDays } from 'lucide-react';
+import { LayoutGrid, Columns3, CalendarDays, GanttChart as GanttChartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export type ViewMode = 'grid' | 'kanban' | 'calendar';
+export type ViewMode = 'grid' | 'kanban' | 'calendar' | 'gantt';
 
 interface ViewToggleProps {
   viewMode: ViewMode;
@@ -14,6 +14,7 @@ export const ViewToggle = ({ viewMode, onViewModeChange }: ViewToggleProps) => {
     { mode: 'grid', icon: LayoutGrid, label: 'Grid' },
     { mode: 'kanban', icon: Columns3, label: 'Kanban' },
     { mode: 'calendar', icon: CalendarDays, label: 'Calendar' },
+    { mode: 'gantt', icon: GanttChartIcon, label: 'Gantt' },
   ];
 
   return (

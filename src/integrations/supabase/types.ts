@@ -285,9 +285,12 @@ export type Database = {
           completed: boolean
           created_at: string
           created_by: string
+          dependencies: string[] | null
+          end_date: string | null
           id: string
           order_position: number
           project_id: string
+          start_date: string | null
           title: string
           updated_at: string
         }
@@ -295,9 +298,12 @@ export type Database = {
           completed?: boolean
           created_at?: string
           created_by: string
+          dependencies?: string[] | null
+          end_date?: string | null
           id?: string
           order_position?: number
           project_id: string
+          start_date?: string | null
           title: string
           updated_at?: string
         }
@@ -305,9 +311,12 @@ export type Database = {
           completed?: boolean
           created_at?: string
           created_by?: string
+          dependencies?: string[] | null
+          end_date?: string | null
           id?: string
           order_position?: number
           project_id?: string
+          start_date?: string | null
           title?: string
           updated_at?: string
         }

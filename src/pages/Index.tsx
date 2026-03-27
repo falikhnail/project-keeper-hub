@@ -13,6 +13,7 @@ import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { CalendarView } from '@/components/CalendarView';
+import { GanttChart } from '@/components/GanttChart';
 import { DraggableGridView } from '@/components/DraggableGridView';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { BulkActionsBar } from '@/components/BulkActionsBar';
@@ -465,6 +466,25 @@ const Index = () => {
               onStatusChange={handleStatusChange}
               onEdit={handleEditProject}
               onDelete={handleDeleteProject}
+            />
+          ) : viewMode === 'gantt' ? (
+            <GanttChart
+              projects={filteredProjects.map(p => ({
+                id: p.id,
+                name: p.name,
+                status: p.status,
+                due_date: p.due_date,
+                created_at: p.created_at,
+                tags: p.tags,
+                subtasks: (p.subtasks || []).map(s => ({
+                  id: s.id,
+                  title: s.title,
+                  completed: s.completed,
+                  start_date: s.start_date,
+                  end_date: s.end_date,
+                  dependencies: s.dependencies || [],
+                })),
+              }))}
             />
           ) : (
             <CalendarView
