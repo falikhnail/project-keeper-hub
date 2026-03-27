@@ -13,6 +13,7 @@ import { StatsCard } from '@/components/StatsCard';
 import { SearchFilter } from '@/components/SearchFilter';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { CalendarView } from '@/components/CalendarView';
+import { GanttChart } from '@/components/GanttChart';
 import { DraggableGridView } from '@/components/DraggableGridView';
 import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { BulkActionsBar } from '@/components/BulkActionsBar';
