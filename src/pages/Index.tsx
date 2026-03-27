@@ -396,6 +396,16 @@ const Index = () => {
             />
           </div>
 
+          {/* Recurring Tasks */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="mb-8 rounded-xl border border-border bg-card p-6"
+          >
+            <RecurringTasksManager />
+          </motion.div>
+
           {/* Search & Filter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
