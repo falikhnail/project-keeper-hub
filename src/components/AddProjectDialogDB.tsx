@@ -27,7 +27,7 @@ import { DueDatePicker } from '@/components/DueDatePicker';
 interface AddProjectDialogDBProps {
   open: boolean;
   onClose: () => void;
-   onSave: (project: ProjectInput, initialSubtasks?: string[]) => Promise<void>;
+   onSave: (project: ProjectInput, initialSubtasks?: string[], templateHandlerIds?: string[]) => Promise<void>;
   editingProject?: Project | null;
 }
 
