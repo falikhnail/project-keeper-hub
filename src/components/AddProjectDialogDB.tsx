@@ -85,6 +85,7 @@ export const AddProjectDialogDB = ({
      setTags(template.default_tags);
      setReminderDays(template.default_reminder_days);
      setInitialSubtasks(template.subtask_titles);
+     setTemplateHandlerIds(template.default_handler_ids || []);
      setTemplateOpen(false);
    };
 
