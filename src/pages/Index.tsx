@@ -19,6 +19,7 @@ import { ViewToggle, ViewMode } from '@/components/ViewToggle';
 import { BulkActionsBar } from '@/components/BulkActionsBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { OnboardingGuide } from '@/components/OnboardingGuide';
+import { RecurringTasksManager } from '@/components/RecurringTasksManager';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
