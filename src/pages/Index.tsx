@@ -225,7 +225,17 @@ const Index = () => {
   };
 
   const handleStatusChange = async (projectId: string, newStatus: ProjectStatus) => {
+    const project = projects.find(p => p.id === projectId);
+    const oldStatus = project?.status || 'unknown';
     await updateProjectStatus(projectId, newStatus);
+    if (project) {
+      sendNotification({
+        event_type: 'status_change',
+        project_name: project.name,
+        project_id: projectId,
+        details: { 'Status Lama': oldStatus, 'Status Baru': newStatus },
+      });
+    }
   };
 
   const handleCloseDialog = () => {
