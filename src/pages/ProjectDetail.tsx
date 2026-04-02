@@ -362,8 +362,8 @@ const ProjectDetail = () => {
                   <CommentsSection
                     comments={project.comments}
                     currentUserProfileId={profile?.id}
-                    onAddComment={(content, mentions, parentId) => {
-                      addComment(project.id, content, mentions, parentId);
+                    onAddComment={async (content, mentions, parentId) => {
+                      await addComment(project.id, content, mentions, parentId);
                       sendNotification({
                         event_type: 'comment',
                         project_name: project.name,
