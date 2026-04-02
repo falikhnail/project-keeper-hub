@@ -362,7 +362,15 @@ const ProjectDetail = () => {
                   <CommentsSection
                     comments={project.comments}
                     currentUserProfileId={profile?.id}
-                    onAddComment={(content, mentions, parentId) => addComment(project.id, content, mentions, parentId)}
+                    onAddComment={(content, mentions, parentId) => {
+                      addComment(project.id, content, mentions, parentId);
+                      sendNotification({
+                        event_type: 'comment',
+                        project_name: project.name,
+                        project_id: project.id,
+                        details: { 'Komentar': content.substring(0, 200) },
+                      });
+                    }}
                     onDeleteComment={deleteComment}
                     onUpdateComment={updateComment}
                   />
