@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, FolderGit2, Users, CheckCircle2, PauseCircle, LogOut, Loader2, BarChart3, User } from 'lucide-react';
+import { SlackSettings } from '@/components/SlackSettings';
+import { useSlackNotifications } from '@/hooks/useSlackNotifications';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useProjects, ProjectInput, Project } from '@/hooks/useProjects';
@@ -37,6 +39,7 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { profile, signOut } = useAuth();
  const { projects, loading, addProject, updateProject, updateProjectStatus, bulkUpdateStatus, bulkDeleteProjects, deleteProject, addSubtask, addHandler } = useProjects();
+  const { sendNotification } = useSlackNotifications();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -222,7 +225,17 @@ const Index = () => {
   };
 
   const handleStatusChange = async (projectId: string, newStatus: ProjectStatus) => {
+    const project = projects.find(p => p.id === projectId);
+    const oldStatus = project?.status || 'unknown';
     await updateProjectStatus(projectId, newStatus);
+    if (project) {
+      sendNotification({
+        event_type: 'status_change',
+        project_name: project.name,
+        project_id: projectId,
+        details: { 'Status Lama': oldStatus, 'Status Baru': newStatus },
+      });
+    }
   };
 
   const handleCloseDialog = () => {
@@ -310,6 +323,7 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
                 className="flex items-center gap-3"
               >
+                <SlackSettings />
                 <ThemeToggle />
                 <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                 <Button variant="outline" onClick={() => navigate('/analytics')} className="gap-2">

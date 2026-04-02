@@ -501,6 +501,45 @@ export type Database = {
           },
         ]
       }
+      slack_webhook_configs: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          notify_comments: boolean
+          notify_deadlines: boolean
+          notify_handler_change: boolean
+          notify_status_change: boolean
+          updated_at: string
+          user_id: string
+          webhook_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notify_comments?: boolean
+          notify_deadlines?: boolean
+          notify_handler_change?: boolean
+          notify_status_change?: boolean
+          updated_at?: string
+          user_id: string
+          webhook_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notify_comments?: boolean
+          notify_deadlines?: boolean
+          notify_handler_change?: boolean
+          notify_status_change?: boolean
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string
+        }
+        Relationships: []
+      }
       team_invitations: {
         Row: {
           created_at: string

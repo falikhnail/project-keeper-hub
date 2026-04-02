@@ -34,6 +34,7 @@ import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
 import { TeamManagement } from '@/components/TeamManagement';
 import { TimeTracker } from '@/components/TimeTracker';
 import { AIAssistant } from '@/components/AIAssistant';
+import { useSlackNotifications } from '@/hooks/useSlackNotifications';
  import { useState } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -51,6 +52,7 @@ const ProjectDetail = () => {
   const { profile } = useAuth();
   const { projects, loading, addHandler, removeHandler, fetchAllProfiles, addComment, deleteComment, updateComment, addSubtask, toggleSubtask, deleteSubtask, updateSubtask, reorderSubtasks, uploadAttachment, deleteAttachment, getAttachmentPublicUrl, updateProject, refetch } = useProjects();
    const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+  const { sendNotification } = useSlackNotifications();
 
   if (loading) {
     return (
@@ -291,7 +293,15 @@ const ProjectDetail = () => {
                     </div>
                     <AddHandlerDialog
                       existingHandlerIds={project.all_handlers.map((h) => h.id)}
-                      onAddHandler={(profileId) => addHandler(project.id, profileId)}
+                      onAddHandler={async (profileId) => {
+                        await addHandler(project.id, profileId);
+                        sendNotification({
+                          event_type: 'handler_change',
+                          project_name: project.name,
+                          project_id: project.id,
+                          details: { 'Aksi': 'Handler baru ditambahkan' },
+                        });
+                      }}
                       fetchAllProfiles={fetchAllProfiles}
                     />
                   </div>
@@ -352,7 +362,15 @@ const ProjectDetail = () => {
                   <CommentsSection
                     comments={project.comments}
                     currentUserProfileId={profile?.id}
-                    onAddComment={(content, mentions, parentId) => addComment(project.id, content, mentions, parentId)}
+                    onAddComment={async (content, mentions, parentId) => {
+                      await addComment(project.id, content, mentions, parentId);
+                      sendNotification({
+                        event_type: 'comment',
+                        project_name: project.name,
+                        project_id: project.id,
+                        details: { 'Komentar': content.substring(0, 200) },
+                      });
+                    }}
                     onDeleteComment={deleteComment}
                     onUpdateComment={updateComment}
                   />
