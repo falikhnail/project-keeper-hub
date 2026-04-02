@@ -34,6 +34,7 @@ import { SaveAsTemplateDialog } from '@/components/SaveAsTemplateDialog';
 import { TeamManagement } from '@/components/TeamManagement';
 import { TimeTracker } from '@/components/TimeTracker';
 import { AIAssistant } from '@/components/AIAssistant';
+import { useSlackNotifications } from '@/hooks/useSlackNotifications';
  import { useState } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
