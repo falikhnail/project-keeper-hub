@@ -323,6 +323,7 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
                 className="flex items-center gap-3"
               >
+                <SlackSettings />
                 <ThemeToggle />
                 <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                 <Button variant="outline" onClick={() => navigate('/analytics')} className="gap-2">
