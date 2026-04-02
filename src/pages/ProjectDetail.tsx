@@ -293,7 +293,15 @@ const ProjectDetail = () => {
                     </div>
                     <AddHandlerDialog
                       existingHandlerIds={project.all_handlers.map((h) => h.id)}
-                      onAddHandler={(profileId) => addHandler(project.id, profileId)}
+                      onAddHandler={(profileId) => {
+                        addHandler(project.id, profileId);
+                        sendNotification({
+                          event_type: 'handler_change',
+                          project_name: project.name,
+                          project_id: project.id,
+                          details: { 'Aksi': 'Handler baru ditambahkan' },
+                        });
+                      }}
                       fetchAllProfiles={fetchAllProfiles}
                     />
                   </div>
